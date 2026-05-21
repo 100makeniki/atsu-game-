@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>それ、アウトです。ハラスメント判定クイズ | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #e63946;
+    --accent2: #06C755; --tag-bg: #edeae4;
+    --pw: #9b59b6; --mo: #e67e22; --sx: #e63946;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .back-link { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  .back-link:hover { color: var(--text); }
+  .page-wrap { max-width: 680px; margin: 0 auto; padding: 40px 24px 0; }
+  .breadcrumb { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 24px; }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .game-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; }
+  .game-icon { font-size: 48px; width: 72px; height: 72px; background: var(--tag-bg); border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .game-meta h1 { font-family: 'DotGothic16', monospace; font-size: 22px; margin-bottom: 6px; letter-spacing: 0.03em; line-height: 1.4; }
+  .game-meta p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 10px; padding: 2px 8px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); letter-spacing: 0.05em; }
+  .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 28px; }
+
+  /* ── QUIZ FRAME ── */
+  .quiz-frame { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 28px; }
+
+  /* Progress */
+  .progress-bar-wrap { height: 4px; background: var(--tag-bg); }
+  .progress-bar { height: 4px; background: var(--accent); transition: width 0.4s ease; }
+
+  .quiz-inner { padding: 28px 24px 24px; }
+
+  /* HUD */
+  .hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'DotGothic16', monospace; font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+  .hud-right { display: flex; gap: 16px; align-items: center; }
+  .hud-score { font-size: 14px; color: var(--text); }
+  .hud-type { font-size: 10px; padding: 2px 8px; border-radius: 2px; color: #fff; letter-spacing: 0.08em; font-family: 'DotGothic16', monospace; }
+  .type-pw { background: var(--pw); }
+  .type-mo { background: var(--mo); }
+  .type-sx { background: var(--sx); }
+
+  /* Timer ring */
+  .timer-wrap { display: flex; justify-content: center; margin-bottom: 20px; position: relative; }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-bg { fill: none; stroke: var(--tag-bg); stroke-width: 4; }
+  .timer-fg { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.05s linear, stroke 0.3s; }
+  .timer-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'DotGothic16', monospace; font-size: 22px; }
+
+  /* Situation box */
+  .situation-box { background: var(--tag-bg); border-left: 3px solid var(--border); border-radius: 2px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.7; color: var(--muted); }
+  .situation-label { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.12em; margin-bottom: 8px; }
+
+  /* Question */
+  .question-text { font-family: 'DotGothic16', monospace; font-size: 17px; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.02em; white-space: pre-line; }
+
+  /* Answer buttons */
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+  .ans-btn { width: 100%; text-align: left; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--surface); font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--text); cursor: pointer; transition: border-color 0.12s, background 0.12s; letter-spacing: 0.01em; line-height: 1.6; }
+  .ans-btn:hover:not(:disabled) { border-color: var(--text); background: var(--tag-bg); }
+  .ans-btn.correct { border-color: var(--accent2); background: #f0fdf4; color: #166534; }
+  .ans-btn.wrong { border-color: var(--accent); background: #fff1f2; color: #9f1239; }
+  .ans-btn.reveal { border-color: var(--accent2); background: #f0fdf4; color: #166534; opacity: 0.6; }
+  .ans-btn:disabled { cursor: default; }
+
+  /* OX buttons */
+  .ox-wrap { display: flex; gap: 12px; }
+  .ox-btn { flex: 1; padding: 20px; border: 1.5px solid var(--border); border-radius: 4px; background: var(--surface); font-family: 'DotGothic16', monospace; font-size: 32px; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+  .ox-btn:hover:not(:disabled) { border-color: var(--text); background: var(--tag-bg); }
+  .ox-btn.o { border-color: var(--accent2) !important; background: #f0fdf4; }
+  .ox-btn.x { border-color: var(--accent) !important; background: #fff1f2; }
+  .ox-btn:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback { margin-top: 16px; padding: 14px 16px; border-radius: 4px; font-size: 13px; line-height: 1.8; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .feedback.ng { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; }
+  .feedback-title { font-family: 'DotGothic16', monospace; font-size: 14px; margin-bottom: 6px; }
+  .feedback-law { font-size: 11px; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+  /* Next btn */
+  .next-btn { display: none; width: 100%; margin-top: 14px; padding: 12px; background: var(--text); color: #fff; border: none; border-radius: 2px; font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; }
+  .next-btn.show { display: block; }
+  .next-btn:hover { opacity: 0.75; }
+
+  /* Screens */
+  .screen { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 40px 24px; text-align: center; }
+  .screen.active { display: flex; }
+  .screen-title { font-family: 'DotGothic16', monospace; font-size: 24px; letter-spacing: 0.04em; }
+  .screen-sub { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .result-score { font-family: 'DotGothic16', monospace; font-size: 48px; }
+  .result-label { font-size: 13px; color: var(--muted); }
+  .result-verdict { font-family: 'DotGothic16', monospace; font-size: 14px; padding: 8px 20px; border-radius: 2px; background: var(--tag-bg); letter-spacing: 0.05em; }
+  .result-breakdown { display: flex; gap: 20px; margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .result-breakdown span { display: flex; align-items: center; gap: 4px; }
+  .btn { font-family: 'DotGothic16', monospace; font-size: 13px; padding: 10px 28px; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; }
+  .btn-primary { background: var(--text); color: #fff; border: none; }
+  .btn-secondary { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+  .btn:hover { opacity: 0.75; }
+
+  /* Combo */
+  .combo-flash { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'DotGothic16', monospace; font-size: 28px; color: var(--accent2); pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 999; letter-spacing: 0.1em; }
+  .combo-flash.show { opacity: 1; }
+
+  /* Difficulty meter */
+  .diff-label { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 4px; text-align: center; }
+  .diff-dots { display: flex; gap: 4px; justify-content: center; margin-bottom: 20px; }
+  .diff-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-bg); border: 1px solid var(--border); transition: background 0.3s; }
+  .diff-dot.active { background: var(--accent); border-color: var(--accent); }
+
+  .how-to { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-bottom: 40px; }
+  .how-to h2 { font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px; color: var(--muted); }
+  .how-to ul { list-style: none; font-size: 13px; line-height: 2; color: var(--text); }
+  .how-to ul li::before { content: '▸ '; color: var(--accent); }
+
+  footer { max-width: 680px; margin: 40px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .shake { animation: shake 0.3s ease; }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
+  .pop { animation: pop 0.2s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <a href="../index.html" class="back-link">← ゲーム一覧</a>
+</header>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="../index.html">トップ</a> &nbsp;/&nbsp; それ、アウトです。
+  </div>
+  <div class="game-header">
+    <div class="game-icon">⚖️</div>
+    <div class="game-meta">
+      <h1>それ、アウトです。<br>ハラスメント判定クイズ</h1>
+      <p>「これってアウト？セーフ？」——パワハラ・モラハラ・セクハラ、全15問。笑えるうちはまだ序盤。</p>
+      <div class="tags"><span class="tag">クイズ</span><span class="tag">全15問</span><span class="tag">パワハラ</span><span class="tag">モラハラ</span><span class="tag">セクハラ</span><span class="tag">無料</span></div>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
+
+  <div class="quiz-frame" id="quiz-frame">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="quiz-inner">
+
+      <!-- START SCREEN -->
+      <div class="screen active" id="screen-start">
+        <div style="font-size:48px">⚖️</div>
+        <div class="screen-title">それ、アウトです。</div>
+        <div class="screen-sub">パワハラ・モラハラ・セクハラを全15問でジャッジ。<br>前半は笑えるかも。後半は笑えない。<br>制限時間あり・ランダム出題</div>
+        <button class="btn btn-primary" onclick="startQuiz()">▶ スタート</button>
+      </div>
+
+      <!-- QUIZ SCREEN -->
+      <div class="screen" id="screen-quiz" style="padding:0;align-items:stretch;gap:0">
+        <div style="padding:20px 24px 0">
+          <div class="hud">
+            <span id="hud-q">Q1 / 15</span>
+            <div class="hud-right">
+              <span id="hud-type-badge" class="hud-type type-pw">パワハラ</span>
+              <span class="hud-score">🔥 <span id="hud-score">0</span></span>
+            </div>
+          </div>
+          <div class="timer-wrap">
+            <svg class="timer-svg" width="60" height="60" viewBox="0 0 60 60">
+              <circle class="timer-bg" cx="30" cy="30" r="26"/>
+              <circle class="timer-fg" id="timer-circle" cx="30" cy="30" r="26" stroke-dasharray="163.4" stroke-dashoffset="0"/>
+            </svg>
+            <div class="timer-num" id="timer-num">15</div>
+          </div>
+          <div class="diff-label">DIFFICULTY</div>
+          <div class="diff-dots" id="diff-dots">
+            <div class="diff-dot"></div><div class="diff-dot"></div><div class="diff-dot"></div>
+            <div class="diff-dot"></div><div class="diff-dot"></div>
+          </div>
+          <div id="situation-wrap" style="display:none">
+            <div class="situation-label">SITUATION</div>
+            <div class="situation-box" id="situation-text"></div>
+          </div>
+          <div class="question-text" id="question-text"></div>
+        </div>
+        <div style="padding:0 24px 24px">
+          <div class="answers" id="answers-wrap"></div>
+          <div class="feedback" id="feedback">
+            <div class="feedback-title" id="feedback-title"></div>
+            <div id="feedback-body"></div>
+            <div class="feedback-law" id="feedback-law"></div>
+          </div>
+          <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ ▶</button>
+        </div>
+      </div>
+
+
+      <!-- GAMEOVER SCREEN -->
+      <div class="screen" id="screen-gameover">
+        <div style="font-size:48px">💀</div>
+        <div class="screen-title">GAME OVER</div>
+        <div style="font-family:'DotGothic16',monospace;font-size:16px;margin:4px 0 2px" id="go-dest"></div>
+        <div style="font-size:12px;color:var(--muted)">2連続アウト</div>
+        <div style="font-family:'DotGothic16',monospace;font-size:13px;color:var(--muted);margin-top:4px"><span id="go-q"></span> で脱落 / スコア <span id="go-score"></span></div>
+        <button class="btn btn-secondary" onclick="shareGameOver()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">もう一度</button>
+      </div>
+      <!-- RESULT SCREEN -->
+      <div class="screen" id="screen-result">
+        <div class="result-score" id="result-score">0</div>
+        <div class="result-label">/ 15問正解</div>
+        <div class="result-verdict" id="result-verdict"></div>
+        <div class="result-breakdown" id="result-breakdown"></div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.9;max-width:320px" id="result-msg"></div>
+        <button class="btn btn-secondary" onclick="shareResult()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">もう一度</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="how-to">
+    <h2>HOW TO PLAY</h2>
+    <ul>
+      <li>○×問題・選択肢問題・シチュエーション判定の3形式がランダムに出る</li>
+      <li>各問に制限時間あり（10〜15秒）。時間切れは不正解</li>
+      <li>正解するとスコア加算。連続正解でボーナス</li>
+      <li>全15問。後半ほど難しくなる</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="../privacy.html">プライバシーポリシー</a>
+    <a href="../contact.html">お問い合わせ</a>
+  </div>
+</footer>
+
+<div class="combo-flash" id="combo-flash"></div>
+
+<script>
+// ─── QUESTION BANK ───────────────────────────────────────────────────
+// type: 'ox' | 'choice' | 'situation'
+// category: 'pw' | 'mo' | 'sx'
+// difficulty: 1-5
+
+const ALL_QUESTIONS = [
+  {
+    type:'ox', category:'pw', difficulty:1,
+    situation:'部下がミスをした。上司が言った。',
+    q:`「なんでできないの？」
+これだけでパワハラ？`,
+    correct:'x',
+    feedback_ok:'1回じゃ証拠にもならん。毎日言い続けたらアウト。',
+    feedback_ng:'言葉より回数と感情の温度が問題。',
+    destination: null
+  },
+  {
+    type:'ox', category:'pw', difficulty:1,
+    situation:'新人が同じミスをした。先輩が言った。',
+    q:`「前にも言ったよね」
+これだけでアウト？`,
+    correct:'x',
+    feedback_ok:'それだけじゃグレー。詰めの道具として毎朝使ったらアウト。',
+    feedback_ng:'文脈と頻度次第。詰めの武器にしてたら別の話。',
+    destination: null
+  },
+  {
+    type:'ox', category:'sx', difficulty:1,
+    situation:'同僚に雑談で聞いた。',
+    q:`「結婚してるの？」
+1回聞いただけでセクハラ？`,
+    correct:'x',
+    feedback_ok:'1回だけならギリセーフ。「なんで？まだ？」と追いかけるとアウト。',
+    feedback_ng:'追いかけなければギリ許容範囲。「なんで？」が危ない。',
+    destination: null
+  },
+  {
+    type:'ox', category:'mo', difficulty:1,
+    situation:'会議でミスを指摘するとき上司が言った。',
+    q:`「あなたって本当に頭悪いね」
+モラハラ？`,
+    correct:'o',
+    feedback_ok:'完全アウト。仕事の指摘じゃなく人格攻撃。言い訳不可。',
+    feedback_ng:'これはアウト。「仕事のミス」と「人間性の否定」は別物。',
+    destination:'😱 人格否定で訴訟コース確定'
+  },
+  {
+    type:'ox', category:'pw', difficulty:1,
+    situation:'残業を断った翌日から。',
+    q:`「……（無視）」
+無視だけでパワハラ？`,
+    correct:'o',
+    feedback_ok:'アウト。無視・孤立化は「人間関係の切り離し」型パワハラ。',
+    feedback_ng:'言葉を使わない攻撃も立派なパワハラ。',
+    destination:'🚪 人間関係の切り離しで労基直行'
+  },
+  {
+    type:'ox', category:'sx', difficulty:2,
+    situation:'男性社員が男性の後輩に言い続けた。',
+    q:`「お前デブじゃん、彼女できるわけないよ」
+同性だからセクハラじゃない？`,
+    correct:'x',
+    feedback_ok:'性別関係なし。同性間でも普通にアウト。',
+    feedback_ng:'「男同士だから」は通じない。同性間でも成立する。',
+    destination: null
+  },
+  {
+    type:'ox', category:'mo', difficulty:2,
+    situation:'能力の高い中堅社員に対して半年間。',
+    q:`「これやっといて。誰でもできる仕事だから」
+問題ない？`,
+    correct:'x',
+    feedback_ok:'過小要求型パワハラ。追い出し部屋の定番手口。',
+    feedback_ng:'仕事を「与えない・下げる」もパワハラ6類型のひとつ。',
+    destination:'🗑️ 過小要求型パワハラで労基送り'
+  },
+  {
+    type:'ox', category:'pw', difficulty:2,
+    situation:'部下のミス報告を聞きながら上司が。',
+    q:`「（ドン）」机を叩きながら怒鳴った。
+パワハラ？`,
+    correct:'o',
+    feedback_ok:'アウト。机が人じゃないだけで身体的攻撃型に相当する。',
+    feedback_ng:'物に当たっても威圧行為として認定される。',
+    destination:'🪑 備品破壊で刑事案件コース'
+  },
+  {
+    type:'ox', category:'pw', difficulty:2,
+    situation:'忘年会の席で酔った部長が部下に言った。',
+    q:`「お前みたいなやつは辞めちまえ」
+お酒の席だからセーフ？`,
+    correct:'x',
+    feedback_ok:'アウト。飲み会も「職場に準ずる場」。酔ってても関係なし。',
+    feedback_ng:'「プライベートな場」は言い訳にならない。',
+    destination:'🍻 酔ってもアウト、人事部直送'
+  },
+  {
+    type:'ox', category:'pw', difficulty:3,
+    situation:'創業5年のスタートアップのCEOが全社に言った。',
+    q:`「うちはベンチャーだから
+多少きつくて当たり前」
+OK？`,
+    correct:'x',
+    feedback_ok:'規模・社風に関係なくパワハラ防止義務あり。',
+    feedback_ng:'「うちはベンチャーだから」は免罪符にならない。',
+    destination:'🏢 ベンチャー免罪符不成立、監査行き'
+  },
+  {
+    type:'choice', category:'pw', difficulty:2,
+    situation:'パワハラの知識テスト。',
+    q:'パワハラ6類型に「入らない」のはどれ？',
+    choices:['身体的な攻撃','過大な要求','給与の未払い','個の侵害'],
+    correct:2,
+    feedback_ok:'給与未払いは労基法違反。パワハラとは別の話。',
+    feedback_ng:'給与未払いは労基法。パワハラ6類型は「優越的立場を使った言動」。',
+    destination:'💸 給与未払いは労基署直行'
+  },
+  {
+    type:'choice', category:'pw', difficulty:2,
+    situation:'指導とパワハラの境界線テスト。',
+    q:'パワハラに「なりにくい」のはどれ？',
+    choices:['怒鳴りながら机を叩く','ミスを丁寧に指摘して改善策を一緒に考える','「向いてないんじゃないか」と繰り返す','人前で毎日叱責する'],
+    correct:1,
+    feedback_ok:'ちゃんとした指導はパワハラじゃない。むしろ義務。',
+    feedback_ng:'②だけがまとも。他は全部アウト寄り。',
+    destination: null
+  },
+  {
+    type:'choice', category:'sx', difficulty:2,
+    situation:'セクハラの定義テスト。',
+    q:'セクハラの定義として正しいのはどれ？',
+    choices:['性的な言動で職場環境を害する／不利益を与えること','異性に直接触れる行為のみ','性的な発言を一度でも行うこと','職場内でのみ成立する行為'],
+    correct:0,
+    feedback_ok:'「環境型」と「対価型」の2種類ある。触れなくても成立。',
+    feedback_ng:'一回・異性間・接触のみ・職場内のみ、全部間違い。',
+    destination: null
+  },
+  {
+    type:'choice', category:'mo', difficulty:3,
+    situation:'営業部長が毎朝の朝礼で数字が悪い部下に言う。',
+    q:`「Aさん、今日も期待してますよ（笑）」
+を全員の前で3ヶ月言い続けた。これは？`,
+    choices:['パワハラになる','笑顔だからセーフ','指導の範囲内','文脈次第でどちらもある'],
+    correct:0,
+    feedback_ok:'笑顔でやってもアウト。継続性と公開性が決め手。',
+    feedback_ng:'笑いながら詰めるのが一番タチが悪いパターン。',
+    destination:'😊 笑顔パワハラ確定、精神的攻撃型認定'
+  },
+  {
+    type:'choice', category:'pw', difficulty:3,
+    situation:'部下が適応障害と診断された。上司の行動は。',
+    q:`「何も言っていない。ただメールを無視して
+会議で発言させず飲み会に呼ばなかっただけ」
+これは？`,
+    choices:['パワハラになる','言葉がないからセーフ','本人の問題','証明できないからセーフ'],
+    correct:0,
+    feedback_ok:'言葉なしでもアウト。無視・排除・孤立化は人間関係の切り離し型。',
+    feedback_ng:'「何も言ってない」は免罪符にならない。行動で追い込むのも完全アウト。',
+    destination:'🚑 適応障害との因果関係で民事訴訟コース'
+  },
+]
+
+// ─── GAME STATE ───────────────────────────────────────────────────────
+let questions = []
+let qIdx = 0
+let score = 0
+let combo = 0
+let consecutiveMiss = 0
+let answered = false
+let timerInterval = null
+let timeLeft = 15
+let stats = { pw: { ok: 0, total: 0 }, mo: { ok: 0, total: 0 }, sx: { ok: 0, total: 0 } }
+
+function shuffle(arr) {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+function startQuiz() {
+  questions = shuffle(ALL_QUESTIONS).slice(0, 15)
+  qIdx = 0; score = 0; combo = 0; consecutiveMiss = 0
+  stats = { pw: { ok: 0, total: 0 }, mo: { ok: 0, total: 0 }, sx: { ok: 0, total: 0 } }
+  showScreen('screen-quiz')
+  renderQuestion()
+}
+
+function renderQuestion() {
+  const q = questions[qIdx]
+  answered = false
+  hideDestination()
+
+  // progress
+  document.getElementById('progress-bar').style.width = ((qIdx / 15) * 100) + '%'
+
+  // hud
+  document.getElementById('hud-q').textContent = `Q${qIdx + 1} / 15`
+  document.getElementById('hud-score').textContent = score
+
+  const badge = document.getElementById('hud-type-badge')
+  const labels = { pw: 'パワハラ', mo: 'モラハラ', sx: 'セクハラ' }
+  badge.textContent = labels[q.category]
+  badge.className = 'hud-type type-' + q.category
+
+  // difficulty dots
+  const dots = document.querySelectorAll('.diff-dot')
+  dots.forEach((d, i) => d.classList.toggle('active', i < q.difficulty))
+
+  // situation
+  const sitWrap = document.getElementById('situation-wrap')
+  if (q.situation) {
+    sitWrap.style.display = 'block'
+    document.getElementById('situation-text').textContent = q.situation
+  } else {
+    sitWrap.style.display = 'none'
+  }
+
+  // question
+  document.getElementById('question-text').textContent = q.q
+
+  // answers
+  const wrap = document.getElementById('answers-wrap')
+  wrap.innerHTML = ''
+
+  if (q.type === 'ox') {
+    wrap.innerHTML = `
+      <div class="ox-wrap">
+        <button class="ox-btn" onclick="answerOX('o')">⭕</button>
+        <button class="ox-btn" onclick="answerOX('x')">❌</button>
+      </div>`
+  } else {
+    const choices = q.type === 'situation' ? q.choices : q.choices
+    choices.forEach((c, i) => {
+      const btn = document.createElement('button')
+      btn.className = 'ans-btn'
+      btn.textContent = `${['A', 'B', 'C', 'D'][i]}. ${c}`
+      btn.onclick = () => answerChoice(i)
+      wrap.appendChild(btn)
+    })
+  }
+
+  // feedback reset
+  const fb = document.getElementById('feedback')
+  fb.className = 'feedback'
+  fb.style.display = 'none'
+  document.getElementById('next-btn').className = 'next-btn'
+
+  // timer
+  const timeLimit = q.difficulty <= 2 ? 15 : q.difficulty <= 3 ? 12 : 10
+  startTimer(timeLimit)
+}
+
+function startTimer(sec) {
+  clearInterval(timerInterval)
+  timeLeft = sec
+  const circ = document.getElementById('timer-circle')
+  const circumference = 163.4
+  circ.style.stroke = '#e63946'
+
+  function tick() {
+    const frac = timeLeft / sec
+    circ.style.strokeDashoffset = circumference * (1 - frac)
+    circ.style.stroke = frac > 0.5 ? '#e63946' : frac > 0.25 ? '#f59e0b' : '#e63946'
+    document.getElementById('timer-num').textContent = timeLeft
+    timeLeft--
+    if (timeLeft < 0) {
+      clearInterval(timerInterval)
+      if (!answered) timeOut()
+    }
+  }
+  tick()
+  timerInterval = setInterval(tick, 1000)
+}
+
+function timeOut() {
+  answered = true
+  combo = 0
+  consecutiveMiss++
+  const q = questions[qIdx]
+  stats[q.category].total++
+  const dest = q.destination || randomDestination()
+  showFeedback(false, '⏰ TIMEOUT — アウト判定', q.feedback_ng)
+  showDestination(dest)
+  disableAnswers()
+  if (consecutiveMiss >= 2) {
+    setTimeout(() => showGameOver(dest), 1000)
+  } else {
+    showNextBtn()
+  }
+}
+
+function answerOX(ans) {
+  if (answered) return
+  answered = true
+  clearInterval(timerInterval)
+  const q = questions[qIdx]
+  const correct = ans === q.correct
+  stats[q.category].total++
+  if (correct) stats[q.category].ok++
+
+  const btns = document.querySelectorAll('.ox-btn')
+  btns.forEach(b => {
+    b.disabled = true
+    if (b.textContent.includes('⭕') && q.correct === 'o') b.classList.add('o')
+    if (b.textContent.includes('❌') && q.correct === 'x') b.classList.add('x')
+  })
+  if (correct) {
+    btns[ans === 'o' ? 0 : 1].classList.add(ans === 'o' ? 'o' : 'x')
+  }
+
+  handleResult(correct, q)
+}
+
+function answerChoice(idx) {
+  if (answered) return
+  answered = true
+  clearInterval(timerInterval)
+  const q = questions[qIdx]
+  const correct = idx === q.correct
+  stats[q.category].total++
+  if (correct) stats[q.category].ok++
+
+  const btns = document.querySelectorAll('.ans-btn')
+  btns.forEach((b, i) => {
+    b.disabled = true
+    if (i === q.correct) b.classList.add('correct')
+    else if (i === idx && !correct) b.classList.add('wrong')
+  })
+
+  handleResult(correct, q)
+}
+
+function handleResult(correct, q) {
+  if (correct) {
+    combo++
+    consecutiveMiss = 0
+    const base = q.difficulty * 100
+    const bonus = combo >= 3 ? Math.floor(base * 0.5) : combo >= 2 ? Math.floor(base * 0.2) : 0
+    score += base + bonus
+    document.getElementById('hud-score').textContent = score
+    if (combo >= 3) showCombo(`${combo} COMBO!! 🔥 +${bonus}`)
+    else if (combo >= 2) showCombo(`${combo} COMBO +${bonus}`)
+    showFeedback(true, '✅ JUDGE: セーフ', q.feedback_ok)
+    document.querySelector('.quiz-frame').classList.add('pop')
+    setTimeout(() => document.querySelector('.quiz-frame').classList.remove('pop'), 200)
+    disableAnswers()
+    showNextBtn()
+  } else {
+    combo = 0
+    consecutiveMiss++
+    const dest = q.destination || randomDestination()
+    showFeedback(false, '❌ JUDGE: アウト', q.feedback_ng)
+    showDestination(dest)
+    document.querySelector('.quiz-frame').classList.add('shake')
+    setTimeout(() => document.querySelector('.quiz-frame').classList.remove('shake'), 300)
+    disableAnswers()
+    if (consecutiveMiss >= 2) {
+      setTimeout(() => showGameOver(dest), 1000)
+    } else {
+      showNextBtn()
+    }
+  }
+}
+
+function showFeedback(ok, title, body, law) {
+  const fb = document.getElementById('feedback')
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'ng')
+  fb.style.display = 'block'
+  document.getElementById('feedback-title').textContent = title
+  document.getElementById('feedback-body').textContent = body
+  document.getElementById('feedback-law').textContent = law ? '📖 ' + law : ''
+}
+
+function disableAnswers() {
+  document.querySelectorAll('.ans-btn, .ox-btn').forEach(b => b.disabled = true)
+}
+
+function showNextBtn() {
+  document.getElementById('next-btn').className = 'next-btn show'
+}
+
+function nextQuestion() {
+  qIdx++
+  if (qIdx >= 15) {
+    showResult()
+  } else {
+    renderQuestion()
+  }
+}
+
+function showCombo(text) {
+  const el = document.getElementById('combo-flash')
+  el.textContent = text
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 900)
+}
+
+
+const DESTINATIONS = [
+  '🏛️ 労基署送り',
+  '🚔 警察署送り',
+  '🔒 刑務所コース',
+  '📋 監査部直行',
+  '👔 人事部即呼び出し',
+  '📰 週刊誌の一面飾るコース',
+  '🧑‍⚖️ 労働審判確定',
+  '💼 弁護士面談コース',
+  '🗞️ SNS炎上コース',
+  '🏢 取締役会説明コース',
+  '📣 社内通報システム発動',
+  '🚑 産業医面談コース',
+  '⛓️ 民事訴訟コース',
+  '😤 全社メール謝罪コース',
+]
+
+function randomDestination() {
+  return DESTINATIONS[Math.floor(Math.random() * DESTINATIONS.length)]
+}
+
+function showDestination(dest) {
+  let el = document.getElementById('dest-banner')
+  if (!el) {
+    el = document.createElement('div')
+    el.id = 'dest-banner'
+    el.style.cssText = 'margin-top:10px;padding:10px 14px;background:#1a1917;color:#fff;border-radius:4px;font-family:DotGothic16,monospace;font-size:14px;letter-spacing:0.06em;text-align:center;'
+    document.getElementById('feedback').after(el)
+  }
+  el.textContent = dest
+  el.style.display = 'block'
+}
+
+function hideDestination() {
+  const el = document.getElementById('dest-banner')
+  if (el) el.style.display = 'none'
+}
+
+function showGameOver(dest) {
+  clearInterval(timerInterval)
+  showScreen('screen-gameover')
+  document.getElementById('go-dest').textContent = dest
+  document.getElementById('go-score').textContent = score
+  document.getElementById('go-q').textContent = `Q${qIdx + 1} / ${questions.length}`
+}
+
+function showResult() {
+  clearInterval(timerInterval)
+  document.getElementById('progress-bar').style.width = '100%'
+  showScreen('screen-result')
+
+  const total = questions.length
+  const correct = stats.pw.ok + stats.mo.ok + stats.sx.ok
+  document.getElementById('result-score').textContent = correct
+  document.getElementById('result-score').style.color =
+    correct >= 12 ? '#06C755' : correct >= 8 ? '#f59e0b' : '#e63946'
+
+  const verdicts = [
+    [13, 'ハラスメント判定士・上級', 'パワハラ・モラハラ・セクハラを完璧に識別。この知識、職場に必要とされています。'],
+    [10, 'ハラスメント認識レベル：高', '概ね正確に判断できている。グレーゾーンへの感度も磨いていこう。'],
+    [7, 'ハラスメント認識レベル：中', '基本はわかっているが、グレーゾーンに弱い。後半の問題を見直してみて。'],
+    [4, 'ハラスメント認識レベル：要注意', '意外と知らないことが多かったのでは。日常的な言動を一度見直す価値あり。'],
+    [0, '要：ハラスメント研修受講', '知識が不足している。悪意はなくても加害者になるリスクがある。今日から学ぼう。'],
+  ]
+  const [, label, msg] = verdicts.find(([min]) => correct >= min)
+  document.getElementById('result-verdict').textContent = label
+  document.getElementById('result-msg').textContent = msg
+
+  const bd = document.getElementById('result-breakdown')
+  bd.innerHTML = `
+    <span style="color:var(--pw)">🟣 パワハラ ${stats.pw.ok}/${stats.pw.total}</span>
+    <span style="color:var(--mo)">🟠 モラハラ ${stats.mo.ok}/${stats.mo.total}</span>
+    <span style="color:var(--sx)">🔴 セクハラ ${stats.sx.ok}/${stats.sx.total}</span>
+  `
+}
+
+function restartQuiz() {
+  showScreen('screen-start')
+}
+
+
+function shareGameOver() {
+  const dest = document.getElementById('go-dest').textContent
+  const q = document.getElementById('go-q').textContent
+  const url = location.href
+  const text = `ハラスメント判定クイズ、${q}で${dest}！ #圧ゲー #ハラスメント判定 ${url}`
+  if (navigator.share) navigator.share({ title: '圧ゲー', text, url })
+  else { navigator.clipboard.writeText(text); alert('コピーしました！') }
+}
+
+function shareResult() {
+  const correct = stats.pw.ok + stats.mo.ok + stats.sx.ok
+  const url = location.href
+  const text = `ハラスメント判定クイズ、${correct}/15問正解！スコア${score}点 #圧ゲー #ハラスメント判定 ${url}`
+  if (navigator.share) navigator.share({ title: '圧ゲー', text, url })
+  else { navigator.clipboard.writeText(text); alert('コピーしました！') }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+}
+
+startQuiz
+</script>
+</body>
+</html>
