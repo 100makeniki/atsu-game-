@@ -23,31 +23,32 @@
   .page-wrap { max-width: 600px; margin: 0 auto; padding: 56px 24px 0; }
   .eyebrow { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 12px; }
   h1 { font-family: 'DotGothic16', monospace; font-size: 32px; margin-bottom: 12px; letter-spacing: 0.03em; }
-  .sub { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 40px; }
-  .form-group { margin-bottom: 24px; }
-  label { display: block; font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
-  input, select, textarea {
-    width: 100%; padding: 10px 14px;
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 2px; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--text);
-    outline: none; transition: border-color 0.12s;
+  .sub { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 32px; }
+  .contact-options { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+  .contact-card {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px;
+    padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
   }
-  input:focus, select:focus, textarea:focus { border-color: var(--text); }
-  textarea { resize: vertical; min-height: 140px; }
-  .submit-btn {
-    font-family: 'DotGothic16', monospace; font-size: 13px;
-    padding: 11px 32px; background: var(--text); color: var(--surface);
-    border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.1em;
+  .contact-card-label { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+  .contact-card-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+  .contact-btn {
+    font-family: 'DotGothic16', monospace; font-size: 12px;
+    padding: 9px 20px; background: var(--text); color: var(--surface);
+    border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em;
+    text-decoration: none; white-space: nowrap; display: inline-block;
     transition: opacity 0.12s;
   }
-  .submit-btn:hover { opacity: 0.75; }
-  .note { font-size: 12px; color: var(--muted); line-height: 1.8; margin-top: 24px; }
+  .contact-btn:hover { opacity: 0.75; }
+  .contact-btn.secondary {
+    background: transparent; color: var(--text); border: 1.5px solid var(--border);
+  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .note { font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .note a { color: var(--accent); }
   footer { max-width: 600px; margin: 64px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--text); }
-  #thanks { display:none; background:var(--surface); border:1.5px solid var(--accent); border-radius:4px; padding:24px; text-align:center; }
-  #thanks .big { font-family:'DotGothic16',monospace; font-size:20px; margin-bottom:8px; }
-  #thanks .small { font-size:13px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -55,7 +56,6 @@
   <a href="index.html" class="logo">圧ゲー<span>.</span>jp</a>
   <nav>
     <a href="index.html">ゲーム一覧</a>
-    <a href="industry.html">業界版</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     <a href="privacy.html">Privacy</a>
@@ -67,39 +67,29 @@
   <h1>お問い合わせ</h1>
   <p class="sub">掲載・取材・コラボ・業界あるあるのネタ提供など、お気軽にどうぞ。<br>通常2〜3営業日以内にご返信します。</p>
 
-  <div id="form-area">
-    <div class="form-group">
-      <label>お名前 / NAME</label>
-      <input type="text" id="f-name" placeholder="山田 太郎">
+  <div class="contact-options">
+    <div class="contact-card">
+      <div>
+        <div class="contact-card-label">FORM / フォーム</div>
+        <div class="contact-card-text">Googleフォームから送信できます。<br>掲載・取材・コラボ・ネタ提供など何でもどうぞ。</div>
+      </div>
+      <a class="contact-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdp6WOlO1RHpGkOif1KAnmYz1TE9QyiwpI6T7W6Us-TOUNuIg/viewform?usp=header" target="_blank" rel="noopener">▶ フォームを開く</a>
     </div>
-    <div class="form-group">
-      <label>メールアドレス / EMAIL</label>
-      <input type="email" id="f-email" placeholder="you@example.com">
+
+    <div class="contact-card">
+      <div>
+        <div class="contact-card-label">EMAIL / メール</div>
+        <div class="contact-card-text">直接メールでのご連絡も歓迎します。<br>100makeniki@gmail.com</div>
+      </div>
+      <a class="contact-btn secondary" href="mailto:100makeniki@gmail.com">✉ メールする</a>
     </div>
-    <div class="form-group">
-      <label>お問い合わせ種別 / TYPE</label>
-      <select id="f-type">
-        <option value="">選択してください</option>
-        <option>掲載・広告について</option>
-        <option>取材・メディア</option>
-        <option>ゲームコラボ・提案</option>
-        <option>業界ネタ提供</option>
-        <option>不具合報告</option>
-        <option>その他</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>内容 / MESSAGE</label>
-      <textarea id="f-msg" placeholder="ご自由にどうぞ。業界あるあるのネタ提供も大歓迎です！"></textarea>
-    </div>
-    <button class="submit-btn" onclick="sendForm()">▶ 送信する</button>
-    <p class="note">※ 本フォームはデモです。実際には送信されません。<br>※ ご入力いただいた情報は <a href="privacy.html" style="color:var(--accent)">プライバシーポリシー</a> に基づき管理します。</p>
   </div>
 
-  <div id="thanks">
-    <div class="big">✅ 送信しました</div>
-    <div class="small">お問い合わせありがとうございます。2〜3営業日以内にご返信します。</div>
-  </div>
+  <hr class="divider">
+  <p class="note">
+    ※ ご入力いただいた情報は <a href="privacy.html">プライバシーポリシー</a> に基づき管理します。<br>
+    ※ 内容によってはご返信できない場合があります。あらかじめご了承ください。
+  </p>
 </div>
 
 <footer>
@@ -109,17 +99,5 @@
     <a href="contact.html">お問い合わせ</a>
   </div>
 </footer>
-
-<script>
-function sendForm() {
-  const name = document.getElementById('f-name').value.trim()
-  const email = document.getElementById('f-email').value.trim()
-  const type = document.getElementById('f-type').value
-  const msg = document.getElementById('f-msg').value.trim()
-  if (!name || !email || !type || !msg) { alert('すべての項目を入力してください'); return }
-  document.getElementById('form-area').style.display = 'none'
-  document.getElementById('thanks').style.display = 'block'
-}
-</script>
 </body>
 </html>
