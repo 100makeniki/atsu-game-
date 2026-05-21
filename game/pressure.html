@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>圧強め主任保育士から逃げろ | 圧ゲー.jp</title>
+<title>圧強め上司から逃げろ | 圧ゲー.jp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
-    --text: #1a1917; --muted: #7a7772; --accent: #f59e0b; --tag-bg: #edeae4;
+    --text: #1a1917; --muted: #7a7772; --accent: #06C755; --tag-bg: #edeae4;
   }
   body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
   header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
@@ -64,14 +64,14 @@
 
 <div class="page-wrap">
   <div class="breadcrumb">
-    <a href="../index.html">トップ</a> &nbsp;/&nbsp; 圧強め主任保育士から逃げろ
+    <a href="../index.html">トップ</a> &nbsp;/&nbsp; 圧強め上司から逃げろ
   </div>
   <div class="game-header">
-    <div class="game-icon">🧸</div>
+    <div class="game-icon">😰</div>
     <div class="game-meta">
-      <h1>圧強め主任保育士から逃げろ</h1>
-      <p>「連絡帳ちゃんと書いた？」「子どもの気持ちわかってる？」——圧の言葉が降り注ぐ2分間、とにかく逃げ続けろ。</p>
-      <div class="tags"><span class="tag">回避系</span><span class="tag">2分</span><span class="tag">無料</span><span class="tag">保育</span></div>
+      <h1>圧強め上司から逃げろ</h1>
+      <p>「それアジャイルでいける？」「PMいらなくない？」——圧の言葉が降り注ぐ2分間、とにかく逃げ続けろ。</p>
+      <div class="tags"><span class="tag">回避系</span><span class="tag">2分</span><span class="tag">無料</span></div>
     </div>
   </div>
 
@@ -90,10 +90,12 @@
       <button class="touch-btn" id="btn-right" ontouchstart="touchStart('right')" ontouchend="touchEnd('right')" onmousedown="touchStart('right')" onmouseup="touchEnd('right')">▶</button>
     </div>
     <div id="ui-overlay">
+      <!-- START -->
       <div id="screen-start" style="display:flex;flex-direction:column;align-items:center;gap:12px">
         <div style="font-family:'DotGothic16',monospace;font-size:13px;color:#7a7772;letter-spacing:0.1em" id="ctrl-hint">← → キーで移動　Shiftで無敵</div>
         <button class="btn btn-primary" onclick="startGame()">▶ スタート</button>
       </div>
+      <!-- END -->
       <div id="screen-end" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px">
         <div id="end-title"></div>
         <div id="score-disp"></div>
@@ -108,7 +110,7 @@
     <h2>HOW TO PLAY</h2>
     <ul>
       <li>← → キー（PC）または画面下のボタン（スマホ）で左右移動</li>
-      <li>🍵🍰などのアイテムを取るとHP回復</li>
+      <li>☕🍙などのアイテムを取るとHP回復</li>
       <li>Shiftキー or 無敵ボタンで一時無敵（800ms）</li>
       <li>2分間HPが残っていればクリア</li>
     </ul>
@@ -124,42 +126,30 @@
 </footer>
 
 <script>
+// ── constants ──────────────────────────────────────────────
 const W = 320, H = 420
 const PLAYER_Y = H - 60
 const PLAYER_W = 40, PLAYER_H = 40
 const TOTAL_TIME = 120
-const BULLET_COLOR = '#f59e0b'
 
 const FUNNY_WORDS = [
-  '連絡帳ちゃんと書いた？','子どもの気持ちわかってる？','保護者対応どうするの',
-  '製作の準備できてる？','今日のねらいは何？','怪我させたらどうするの',
-  'アレルギー確認した？','もっと子どもに寄り添って','お昼寝の記録は？',
-  'なんで泣いてるかわかる？','月案出した？','環境設定が甘い',
-  'ピアノ弾けるよね？','保護者からクレームきたよ','行事準備間に合う？',
-  '子どもの名前全員言える？','発達の視点が足りない','連携できてる？',
-  '記録が雑すぎる','週案の反省書いた？','私が新人の頃はね',
-  'もっと笑顔で','声が小さい','主体性がない','責任感ある？',
-  '保育観ちゃんと持ってる？','なんでもっと早く言わないの','保護者の顔覚えた？',
-  '安全管理が甘い','指導計画と実践がずれてる','クラスまとめられてる？',
-  '先輩の動き見てた？','なんでできないの','メモ取らないの？',
-  'ピアノ毎日練習して','子どもより先生が大変そう','本当に保育好き？',
-  'サービス残業当たり前だよ','みんな頑張ってるよ','気合いが足りない',
-  '愛情不足じゃない？','向いてないんじゃない','甘えすぎ'
+  'それアジャイルでいける？','PMいらなくない？','MVPでいいから出して','とりあえずリリースしよう','ユーザーの声最優先で',
+  'ピボットしよう','KPIどこ？','それスケールする？','資金調達考えてる？','CTOとしてどう思う？','競合調査した？',
+  '前例ある？','稟議通した？','エビデンスある？','それコンプラ的に大丈夫？','関係部署に確認して',
+  '根拠は？','責任取れる？','上に確認した？','スケジュール厳守で','標準プロセス通して',
+  'レビュー出して','どこ承認？','議事録残して','横展開しておいて','前回事例あるよね',
+  'この温度感わかる？','空気読めてる？','それ炎上しない？','期待値コントロールして','それ誰が嬉しいの？',
+  'それで勝てる？','数字弱くない？','意思決定遅くない？','本質どこ？','もう一段上ない？',
+  'なんでできないの？','普通わかるよね','やる気ある？','前にも言ったよね','それ常識だよ',
+  '給料分働いてる？','期待外れだね','雑すぎる','センスないね','誰でもできるよこれ',
+  '言い訳しないで','責任どうするの','他の人はできてるよ','これでプロ？','時間無駄にしないで',
+  '録音してないよな？','それ新人でもできるよ','2回目はないからね？','AIと交代して'
 ]
-const HEALS = ['🍵','🍰','🧃','🍙','🌸','💐']
-const CLEAR_MSGS = [
-  '保育士耐性：認定済み','主任圧スルー成功','連絡帳サバイバー合格',
-  '製作準備完了で乗り切った','子どもより先輩をかわした','保育観：ぶれず',
-  '月案締め切りクリア','サービス残業耐久：合格','笑顔フィルター機能：正常',
-  '新人認定試験合格'
-]
-const OVER_MSGS = [
-  '子どもが先生を選べないからね','まあ経験不足かな','もっと子どもが好きじゃないと',
-  '気持ちの問題だよ','みんな通る道だから','私も若い頃は怒られたよ',
-  'そのくらいで折れてたら保育できないよ','もう一度保育観を見直して',
-  '先輩も心配してるんだよ','次こそ頑張ろうよ'
-]
+const HEALS = ['☕','🍙','🛌','🍺','🧃','💊']
+const CLEAR_MSGS = ['生き残り適性あり','圧耐性：中〜高レベル','スタートアップ環境適合','大企業圧スルー成功','意思決定速度：良好','ストレス処理能力：合格','上司耐性テストクリア','プロジェクト適応可能','精神耐久：想定以上','圧環境サバイバー認定']
+const OVER_MSGS = ['君には期待してたんだけどね','まあ経験不足かな','ちょっと厳しかったか〜','向いてない人もいるから','学生気分が抜けてないね','これ社会だからさ','俺も若い頃は怒られたよ','そんなメンタルで大丈夫？','主体性が足りないかな','まあ次頑張ろうよ']
 
+// ── state ──────────────────────────────────────────────────
 let state = {}
 let rafId = null
 let spawnTimer = null
@@ -168,7 +158,7 @@ let fontReady = false
 
 function initState() {
   return {
-    phase: 'idle',
+    phase: 'idle', // idle | playing | end
     playerX: W / 2 - PLAYER_W / 2,
     bullets: [],
     hp: 100,
@@ -178,17 +168,20 @@ function initState() {
     keys: {},
     lastSpawn: 0,
     score: 0,
-    endType: null,
+    endType: null, // 'clear' | 'over'
     endMsg: '',
     playerEmoji: '😰',
   }
 }
 
+// ── canvas ─────────────────────────────────────────────────
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
+// ── font preload ───────────────────────────────────────────
 document.fonts.ready.then(() => { fontReady = true; drawIdle() })
 
+// ── input ──────────────────────────────────────────────────
 window.addEventListener('keydown', e => {
   state.keys[e.key] = true
   if (e.key === 'Shift' && state.phase === 'playing') {
@@ -198,6 +191,7 @@ window.addEventListener('keydown', e => {
 })
 window.addEventListener('keyup', e => { state.keys[e.key] = false })
 
+// ── spawn ──────────────────────────────────────────────────
 function spawnBullet() {
   if (state.phase !== 'playing') return
   const elapsed = TOTAL_TIME - state.timeLeft
@@ -210,7 +204,7 @@ function spawnBullet() {
     text: FUNNY_WORDS[Math.floor(Math.random() * FUNNY_WORDS.length)],
     type: 'damage',
     speed: spd,
-    w: 0, h: 28
+    w: 0, h: 28  // measured on first draw
   })
 
   if (Math.random() > 0.55) {
@@ -226,26 +220,32 @@ function spawnBullet() {
   }
 }
 
+// ── game loop ──────────────────────────────────────────────
 let lastTs = null
 function loop(ts) {
   if (state.phase !== 'playing') return
   if (lastTs === null) lastTs = ts
-  const dt = Math.min(ts - lastTs, 50)
+  const dt = Math.min(ts - lastTs, 50) // cap at 50ms to avoid big jumps
   lastTs = ts
 
+  // invincible expiry
   if (state.invincible && ts > state.invincibleUntil) state.invincible = false
 
+  // player movement
   const speed = 4
   if (state.keys['ArrowLeft'])  state.playerX = Math.max(0, state.playerX - speed)
   if (state.keys['ArrowRight']) state.playerX = Math.min(W - PLAYER_W, state.playerX + speed)
 
+  // difficulty
   const elapsed = TOTAL_TIME - state.timeLeft
   const difficulty = Math.min(5, Math.floor(elapsed / 20))
-  const pxScale = dt / 16.67
 
+  // move bullets
+  const pxScale = dt / 16.67 // normalize to ~60fps
   state.bullets = state.bullets.filter(b => b.y < H + 60)
   state.bullets.forEach(b => { b.y += b.speed * pxScale })
 
+  // collision
   const px = state.playerX, py = PLAYER_Y
   state.bullets = state.bullets.filter(b => {
     const bw = b.w || 100
@@ -262,16 +262,20 @@ function loop(ts) {
     return true
   })
 
+  // score
   state.score = elapsed * 10 + difficulty * 50 + state.hp
+
   updateHUD()
   draw()
   rafId = requestAnimationFrame(loop)
 }
 
+// ── draw ───────────────────────────────────────────────────
 function drawIdle() {
   ctx.clearRect(0, 0, W, H)
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, W, H)
+  // ghost player
   ctx.globalAlpha = 0.3
   ctx.font = '36px serif'
   ctx.textAlign = 'center'
@@ -284,21 +288,27 @@ function draw() {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, W, H)
 
+  // bullets
   ctx.textBaseline = 'middle'
   state.bullets.forEach(b => {
     if (b.type === 'damage') {
+      // measure text once
       ctx.font = '11px "Noto Sans JP", sans-serif'
       const tw = ctx.measureText(b.text).width
       b.w = tw + 20
       b.h = 28
+
       const x = Math.round(b.x), y = Math.round(b.y)
-      ctx.fillStyle = BULLET_COLOR
+      // bubble bg
+      ctx.fillStyle = '#06C755'
       roundRect(ctx, x, y, b.w, b.h, 10)
       ctx.fill()
+      // text
       ctx.fillStyle = '#ffffff'
       ctx.textAlign = 'center'
       ctx.fillText(b.text, x + b.w / 2, y + b.h / 2)
     } else {
+      // heal emoji
       b.w = 36; b.h = 36
       ctx.font = '26px serif'
       ctx.textAlign = 'center'
@@ -306,6 +316,7 @@ function draw() {
     }
   })
 
+  // player
   ctx.font = '36px serif'
   ctx.textAlign = 'center'
   if (state.invincible) ctx.globalAlpha = 0.4
@@ -327,6 +338,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath()
 }
 
+// ── HUD ────────────────────────────────────────────────────
 function updateHUD() {
   document.getElementById('hud-time').textContent = state.timeLeft
   const hpEl = document.getElementById('hud-hp')
@@ -335,18 +347,22 @@ function updateHUD() {
   document.getElementById('hud-score').textContent = state.score
 }
 
+// ── game control ───────────────────────────────────────────
 function startGame() {
   state = initState()
   state.phase = 'playing'
   lastTs = null
+
   document.getElementById('screen-start').classList.add('hidden')
   document.getElementById('screen-end').classList.add('hidden')
+
   spawnTimer = setInterval(spawnBullet, 900)
   countdownTimer = setInterval(() => {
     if (state.phase !== 'playing') return
     state.timeLeft--
     if (state.timeLeft <= 0) endGame('clear')
   }, 1000)
+
   rafId = requestAnimationFrame(loop)
 }
 
@@ -356,12 +372,16 @@ function endGame(type) {
   clearInterval(spawnTimer)
   clearInterval(countdownTimer)
   cancelAnimationFrame(rafId)
+
   const msgs = type === 'clear' ? CLEAR_MSGS : OVER_MSGS
   const msg = msgs[Math.floor(Math.random() * msgs.length)]
+
   document.getElementById('end-title').textContent = type === 'clear' ? '🎉 CLEAR！' : '💀 GAME OVER'
   document.getElementById('score-disp').textContent = 'スコア: ' + state.score
   document.getElementById('msg').textContent = msg
   document.getElementById('screen-end').classList.remove('hidden')
+
+  // dim canvas
   ctx.fillStyle = 'rgba(255,255,255,0.7)'
   ctx.fillRect(0, 0, W, H)
 }
@@ -376,11 +396,47 @@ function restartGame() {
 
 function shareScore() {
   const url = window.location.href
-  const text = `圧ゲークリア！スコア:${state.score} #圧ゲー #保育 ${url}`
+  const text = `圧ゲークリア！スコア:${state.score} #圧ゲー ${url}`
   if (navigator.share) navigator.share({ title: '圧ゲー', text, url })
   else { navigator.clipboard.writeText(text); alert('コピーしました') }
 }
 
+
+// ── canvas responsive ──────────────────────────────────────
+function resizeCanvas() {
+  const frame = canvas.parentElement
+  const maxW = Math.min(320, frame.clientWidth - 32)
+  canvas.style.width = maxW + 'px'
+  canvas.style.height = Math.round(maxW * 420 / 320) + 'px'
+}
+window.addEventListener('resize', resizeCanvas)
+resizeCanvas()
+
+// ── touch controls ─────────────────────────────────────────
+const touchState = { left: false, right: false }
+function touchStart(dir) {
+  touchState[dir] = true
+  if (dir === 'left') state.keys['ArrowLeft'] = true
+  else state.keys['ArrowRight'] = true
+}
+function touchEnd(dir) {
+  touchState[dir] = false
+  if (dir === 'left') state.keys['ArrowLeft'] = false
+  else state.keys['ArrowRight'] = false
+}
+function touchInvincible() {
+  if (state.phase === 'playing') {
+    state.invincible = true
+    state.invincibleUntil = performance.now() + 800
+  }
+}
+// show hint based on input type
+if (window.matchMedia('(pointer: coarse)').matches) {
+  const hint = document.getElementById('ctrl-hint')
+  if (hint) hint.textContent = '画面下のボタンで操作'
+}
+
+// ── init ───────────────────────────────────────────────────
 state = initState()
 updateHUD()
 </script>
