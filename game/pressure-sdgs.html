@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDGsハラスメントから逃げろ | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #22c55e; --tag-bg: #edeae4;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .back-link { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  .back-link:hover { color: var(--text); }
+  .page-wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 0; }
+  .breadcrumb { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 24px; }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .game-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 32px; }
+  .game-icon { font-size: 48px; width: 72px; height: 72px; background: var(--tag-bg); border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .game-meta h1 { font-family: 'DotGothic16', monospace; font-size: 24px; margin-bottom: 6px; letter-spacing: 0.03em; }
+  .game-meta p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 10px; padding: 2px 8px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); letter-spacing: 0.05em; }
+  .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 32px; }
+  .game-frame { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; gap: 12px; }
+  #hud { display: flex; gap: 32px; font-family: 'DotGothic16', monospace; font-size: 13px; }
+  canvas { border: 2px solid var(--border); border-radius: 4px; display: block; max-width: 100%; touch-action: none; }
+  #ui-overlay { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .btn { font-family: 'DotGothic16', monospace; font-size: 13px; padding: 8px 24px; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; }
+  .btn-primary { background: #1a1917; color: #fff; border: none; }
+  .btn-secondary { background: transparent; color: #1a1917; border: 1px solid #ddd9d0; }
+  .btn:hover { opacity: 0.75; }
+  #msg { font-family: 'DotGothic16', monospace; font-size: 13px; color: var(--muted); text-align: center; }
+  #end-title { font-family: 'DotGothic16', monospace; font-size: 20px; }
+  #score-disp { font-family: 'DotGothic16', monospace; font-size: 14px; color: var(--muted); }
+  .how-to { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-bottom: 40px; }
+  .how-to h2 { font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px; color: var(--muted); }
+  .how-to ul { list-style: none; font-size: 13px; line-height: 2; color: var(--text); }
+  .how-to ul li::before { content: '▸ '; color: var(--accent); }
+  footer { max-width: 860px; margin: 40px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+  .touch-controls { display: none; gap: 12px; align-items: center; justify-content: center; width: 100%; }
+  @media (pointer: coarse) { .touch-controls { display: flex; } }
+  .touch-btn { font-family: 'DotGothic16', monospace; font-size: 22px; padding: 14px 28px; border-radius: 4px; cursor: pointer; user-select: none; -webkit-user-select: none; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); }
+  .touch-btn:active { background: var(--tag-bg); }
+  .touch-btn-invincible { font-size: 13px; padding: 14px 18px; background: #1a1917; color: #fff; border-color: #1a1917; letter-spacing: 0.08em; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <a href="../index.html" class="back-link">← ゲーム一覧</a>
+</header>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="../index.html">トップ</a> &nbsp;/&nbsp; SDGsハラスメントから逃げろ
+  </div>
+  <div class="game-header">
+    <div class="game-icon">♻️</div>
+    <div class="game-meta">
+      <h1>SDGsハラスメントから逃げろ</h1>
+      <p>「マイボトル持ってないの？」「印刷したの？」「うちもSDGsやろう」——急にエコに目覚めた上司の圧が降り注ぐ2分間、とにかく逃げ続けろ。</p>
+      <div class="tags"><span class="tag">回避系</span><span class="tag">2分</span><span class="tag">無料</span><span class="tag">SDGs</span></div>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
+
+  <div class="game-frame">
+    <div id="hud">
+      <span>残り <b id="hud-time">120</b> 秒</span>
+      <span>HP <b id="hud-hp" style="color:#06C755">100</b></span>
+      <span style="color:#7a7772">スコア <span id="hud-score">0</span></span>
+    </div>
+    <canvas id="canvas" width="320" height="420"></canvas>
+    <div class="touch-controls" id="touch-controls">
+      <button class="touch-btn" id="btn-left">◀</button>
+      <button class="touch-btn touch-btn-invincible" id="btn-inv">無敵</button>
+      <button class="touch-btn" id="btn-right">▶</button>
+    </div>
+    <div id="ui-overlay">
+      <div id="screen-start" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="font-family:'DotGothic16',monospace;font-size:13px;color:#7a7772;letter-spacing:0.1em" id="ctrl-hint">← → キーで移動　Shiftで無敵</div>
+        <button class="btn btn-primary" onclick="startGame()">▶ スタート</button>
+      </div>
+      <div id="screen-end" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div id="end-title"></div>
+        <div id="score-disp"></div>
+        <div id="msg"></div>
+        <button class="btn btn-secondary" onclick="shareScore()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartGame()">リスタート</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <h2>HOW TO PLAY</h2>
+    <ul>
+      <li>← → キー（PC）または画面下のボタン（スマホ）で左右移動</li>
+      <li>🌿☕などのアイテムを取るとHP回復</li>
+      <li>Shiftキー or 無敵ボタンで一時無敵（800ms）</li>
+      <li>2分間HPが残っていればクリア</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="../privacy.html">プライバシーポリシー</a>
+    <a href="../contact.html">お問い合わせ</a>
+  </div>
+</footer>
+
+<script>
+const W = 320, H = 420
+const PLAYER_Y = H - 60
+const PLAYER_W = 40, PLAYER_H = 40
+const TOTAL_TIME = 120
+const BULLET_COLOR = '#22c55e'
+
+const FUNNY_WORDS = [
+  'マイボトル持ってないの？','印刷したの？','紙無駄にしないで',
+  'うちもSDGsやろう','エコバッグ持ってる？','電気消して',
+  'サステナブルな選択して','カーボンニュートラル知ってる？','プラ削減しないと',
+  'SDGsバッジつけなよ','環境への意識低くない？','再生紙使って',
+  'フードロス意識してる？','エシカル消費してる？','ESG経営の時代だよ',
+  'うちのSDGs目標知ってる？','脱炭素に向けて動いて','ペーパーレス化して',
+  'テレワークで通勤CO2減らして','社内のSDGs委員会入って',
+  '本当にサステナブル？','グリーンウォッシュじゃないよね',
+  'CO2排出量計算した？','電力会社変えたの？','マイ箸持ってる？',
+  '食堂のトレーなくそう','詰め替え品買ってる？','エネルギー効率考えて',
+  'SDGs研修行った？','自分ごととして考えて','地球のためでしょ',
+  '意識が低すぎる','みんなやってるよ','まずやってみて',
+  '次世代のためにさ','経営戦略的にも必要','投資家にも見られてるよ',
+  'なんで非協力的なの？','責任感ある？','会社の方針だから',
+  'SDGs17目標言える？','報告書に書いて','数値目標どこ？'
+]
+const HEALS = ['🌿','☕','🍃','🌱','♻️','💧']
+const CLEAR_MSGS = [
+  'SDGs圧耐性：認定済み','グリーンウォッシュスルー成功','エコ強制回避完了',
+  'サステナブル精神：健全','脱炭素プレッシャー完走','環境意識ゲームクリア',
+  'SDGsバッジ不要で乗り切った','マイボトル圧スルー成功','エシカル強制回避認定',
+  '形だけSDGs耐久完了'
+]
+const OVER_MSGS = [
+  '地球のためだからさ','意識の問題だよ','みんなやってるのに',
+  'まあ難しいよね最初は','SDGsって大事だよほんとに','次世代に申し訳ないよ',
+  '経営戦略的にも必要なんだよ','少しずつでもいいから','もっと勉強してよ',
+  'やる気の問題じゃない？'
+]
+
+let state = {}
+let rafId = null
+let spawnTimer = null
+let countdownTimer = null
+let fontReady = false
+
+function initState() {
+  return {
+    phase: 'idle',
+    playerX: W / 2 - PLAYER_W / 2,
+    bullets: [],
+    hp: 100,
+    timeLeft: TOTAL_TIME,
+    invincible: false,
+    invincibleUntil: 0,
+    keys: {},
+    lastSpawn: 0,
+    score: 0,
+    endType: null,
+    endMsg: '',
+    playerEmoji: '😰',
+  }
+}
+
+const canvas = document.getElementById('canvas')
+const ctx = canvas.getContext('2d')
+
+document.fonts.ready.then(() => { fontReady = true; drawIdle() })
+
+window.addEventListener('keydown', e => {
+  state.keys[e.key] = true
+  if (e.key === 'Shift' && state.phase === 'playing') {
+    state.invincible = true
+    state.invincibleUntil = performance.now() + 800
+  }
+})
+window.addEventListener('keyup', e => { state.keys[e.key] = false })
+
+function spawnBullet() {
+  if (state.phase !== 'playing') return
+  const elapsed = TOTAL_TIME - state.timeLeft
+  const spd = 2.5 + (elapsed / TOTAL_TIME) * 4 + Math.random() * 1.5
+  state.bullets.push({
+    id: Math.random(),
+    x: Math.random() * (W - 110),
+    y: -40,
+    text: FUNNY_WORDS[Math.floor(Math.random() * FUNNY_WORDS.length)],
+    type: 'damage',
+    speed: spd,
+    w: 0, h: 28
+  })
+  if (Math.random() > 0.55) {
+    state.bullets.push({
+      id: Math.random() + 9999,
+      x: Math.random() * (W - 44),
+      y: -40,
+      text: HEALS[Math.floor(Math.random() * HEALS.length)],
+      type: 'heal',
+      speed: (spd * 0.65),
+      w: 36, h: 36
+    })
+  }
+}
+
+let lastTs = null
+function loop(ts) {
+  if (state.phase !== 'playing') return
+  if (lastTs === null) lastTs = ts
+  const dt = Math.min(ts - lastTs, 50)
+  lastTs = ts
+  if (state.invincible && ts > state.invincibleUntil) state.invincible = false
+  const speed = 4
+  if (state.keys['ArrowLeft'])  state.playerX = Math.max(0, state.playerX - speed)
+  if (state.keys['ArrowRight']) state.playerX = Math.min(W - PLAYER_W, state.playerX + speed)
+  const elapsed = TOTAL_TIME - state.timeLeft
+  const difficulty = Math.min(5, Math.floor(elapsed / 20))
+  const pxScale = dt / 16.67
+  state.bullets = state.bullets.filter(b => b.y < H + 60)
+  state.bullets.forEach(b => { b.y += b.speed * pxScale })
+  const px = state.playerX, py = PLAYER_Y
+  state.bullets = state.bullets.filter(b => {
+    const bw = b.w || 100
+    const hitX = b.x < px + PLAYER_W && b.x + bw > px
+    const hitY = b.y < py + PLAYER_H && b.y + b.h > py
+    if (hitX && hitY) {
+      if (b.type === 'damage' && !state.invincible) {
+        state.hp = Math.max(0, state.hp - (15 + difficulty * 3))
+        if (state.hp <= 0) endGame('over')
+      }
+      if (b.type === 'heal') state.hp = Math.min(100, state.hp + 8)
+      return false
+    }
+    return true
+  })
+  state.score = elapsed * 10 + difficulty * 50 + state.hp
+  updateHUD()
+  draw()
+  rafId = requestAnimationFrame(loop)
+}
+
+function drawIdle() {
+  ctx.clearRect(0, 0, W, H)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, W, H)
+  ctx.globalAlpha = 0.3
+  ctx.font = '36px serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('😰', W/2, PLAYER_Y + 32)
+  ctx.globalAlpha = 1
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, W, H)
+  ctx.textBaseline = 'middle'
+  state.bullets.forEach(b => {
+    if (b.type === 'damage') {
+      ctx.font = '11px "Noto Sans JP", sans-serif'
+      const tw = ctx.measureText(b.text).width
+      b.w = tw + 20
+      b.h = 28
+      const x = Math.round(b.x), y = Math.round(b.y)
+      ctx.fillStyle = BULLET_COLOR
+      roundRect(ctx, x, y, b.w, b.h, 10)
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
+      ctx.fillText(b.text, x + b.w / 2, y + b.h / 2)
+    } else {
+      b.w = 36; b.h = 36
+      ctx.font = '26px serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(b.text, Math.round(b.x + 18), Math.round(b.y + 22))
+    }
+  })
+  ctx.font = '36px serif'
+  ctx.textAlign = 'center'
+  if (state.invincible) ctx.globalAlpha = 0.4
+  ctx.fillText('😰', Math.round(state.playerX + PLAYER_W / 2), PLAYER_Y + 32)
+  ctx.globalAlpha = 1
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.arcTo(x + w, y, x + w, y + r, r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+  ctx.lineTo(x + r, y + h)
+  ctx.arcTo(x, y + h, x, y + h - r, r)
+  ctx.lineTo(x, y + r)
+  ctx.arcTo(x, y, x + r, y, r)
+  ctx.closePath()
+}
+
+function updateHUD() {
+  document.getElementById('hud-time').textContent = state.timeLeft
+  const hpEl = document.getElementById('hud-hp')
+  hpEl.textContent = state.hp
+  hpEl.style.color = state.hp > 50 ? '#06C755' : state.hp > 25 ? '#f59e0b' : '#e63946'
+  document.getElementById('hud-score').textContent = state.score
+}
+
+function startGame() {
+  state = initState()
+  state.phase = 'playing'
+  lastTs = null
+  document.getElementById('screen-start').classList.add('hidden')
+  document.getElementById('screen-end').classList.add('hidden')
+  spawnTimer = setInterval(spawnBullet, 900)
+  countdownTimer = setInterval(() => {
+    if (state.phase !== 'playing') return
+    state.timeLeft--
+    if (state.timeLeft <= 0) endGame('clear')
+  }, 1000)
+  rafId = requestAnimationFrame(loop)
+}
+
+function endGame(type) {
+  state.phase = 'end'
+  state.endType = type
+  clearInterval(spawnTimer)
+  clearInterval(countdownTimer)
+  cancelAnimationFrame(rafId)
+  const msgs = type === 'clear' ? CLEAR_MSGS : OVER_MSGS
+  const msg = msgs[Math.floor(Math.random() * msgs.length)]
+  document.getElementById('end-title').textContent = type === 'clear' ? '🎉 CLEAR！' : '💀 GAME OVER'
+  document.getElementById('score-disp').textContent = 'スコア: ' + state.score
+  document.getElementById('msg').textContent = msg
+  document.getElementById('screen-end').classList.remove('hidden')
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'
+  ctx.fillRect(0, 0, W, H)
+}
+
+function restartGame() {
+  document.getElementById('screen-end').classList.add('hidden')
+  document.getElementById('screen-start').classList.remove('hidden')
+  state = initState()
+  drawIdle()
+  updateHUD()
+}
+
+function shareScore() {
+  const url = window.location.href
+  const text = `圧ゲークリア！スコア:${state.score} #圧ゲー #SDGsハラスメント ${url}`
+  if (navigator.share) navigator.share({ title: '圧ゲー', text, url })
+  else { navigator.clipboard.writeText(text); alert('コピーしました') }
+}
+
+function resizeCanvas() {
+  const frame = canvas.parentElement
+  const maxW = Math.min(320, frame.clientWidth - 32)
+  canvas.style.width = maxW + 'px'
+  canvas.style.height = Math.round(maxW * 420 / 320) + 'px'
+}
+window.addEventListener('resize', resizeCanvas)
+resizeCanvas()
+
+function touchInvincible() {
+  if (state.phase === 'playing') {
+    state.invincible = true
+    state.invincibleUntil = performance.now() + 800
+  }
+}
+
+;(function() {
+  function setupBtn(id, key) {
+    const btn = document.getElementById(id)
+    if (!btn) return
+    btn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      btn.setPointerCapture(e.pointerId)
+      state.keys[key] = true
+    })
+    btn.addEventListener('pointerup', e => {
+      e.preventDefault()
+      state.keys[key] = false
+    })
+    btn.addEventListener('pointercancel', e => {
+      state.keys[key] = false
+    })
+  }
+  setupBtn('btn-left', 'ArrowLeft')
+  setupBtn('btn-right', 'ArrowRight')
+  const invBtn = document.getElementById('btn-inv')
+  if (invBtn) {
+    invBtn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      touchInvincible()
+    })
+  }
+})()
+
+if (window.matchMedia('(pointer: coarse)').matches) {
+  const hint = document.getElementById('ctrl-hint')
+  if (hint) hint.textContent = '画面下のボタンで操作'
+}
+
+state = initState()
+updateHUD()
+</script>
+</body>
+</html>
