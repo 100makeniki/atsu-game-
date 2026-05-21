@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圧強め上司から逃げろ | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #06C755; --tag-bg: #edeae4;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .back-link { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  .back-link:hover { color: var(--text); }
+  .page-wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 0; }
+  .breadcrumb { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 24px; }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .game-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 32px; }
+  .game-icon { font-size: 48px; width: 72px; height: 72px; background: var(--tag-bg); border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .game-meta h1 { font-family: 'DotGothic16', monospace; font-size: 24px; margin-bottom: 6px; letter-spacing: 0.03em; }
+  .game-meta p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 10px; padding: 2px 8px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); letter-spacing: 0.05em; }
+  .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 32px; }
+  .game-frame { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; gap: 12px; }
+  #hud { display: flex; gap: 32px; font-family: 'DotGothic16', monospace; font-size: 13px; }
+  canvas { border: 2px solid var(--border); border-radius: 4px; display: block; }
+  #ui-overlay { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .btn { font-family: 'DotGothic16', monospace; font-size: 13px; padding: 8px 24px; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; }
+  .btn-primary { background: #1a1917; color: #fff; border: none; }
+  .btn-secondary { background: transparent; color: #1a1917; border: 1px solid #ddd9d0; }
+  .btn:hover { opacity: 0.75; }
+  #msg { font-family: 'DotGothic16', monospace; font-size: 13px; color: var(--muted); text-align: center; }
+  #end-title { font-family: 'DotGothic16', monospace; font-size: 20px; }
+  #score-disp { font-family: 'DotGothic16', monospace; font-size: 14px; color: var(--muted); }
+  .how-to { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-bottom: 40px; }
+  .how-to h2 { font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px; color: var(--muted); }
+  .how-to ul { list-style: none; font-size: 13px; line-height: 2; color: var(--text); }
+  .how-to ul li::before { content: '▸ '; color: var(--accent); }
+  footer { max-width: 860px; margin: 40px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <a href="../index.html" class="back-link">← ゲーム一覧</a>
+</header>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="../index.html">トップ</a> &nbsp;/&nbsp; 圧強め上司から逃げろ
+  </div>
+  <div class="game-header">
+    <div class="game-icon">😰</div>
+    <div class="game-meta">
+      <h1>圧強め上司から逃げろ</h1>
+      <p>「それアジャイルでいける？」「PMいらなくない？」——圧の言葉が降り注ぐ2分間、とにかく逃げ続けろ。</p>
+      <div class="tags"><span class="tag">回避系</span><span class="tag">2分</span><span class="tag">無料</span></div>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
+
+  <div class="game-frame">
+    <div id="hud">
+      <span>残り <b id="hud-time">120</b> 秒</span>
+      <span>HP <b id="hud-hp" style="color:#06C755">100</b></span>
+      <span style="color:#7a7772">スコア <span id="hud-score">0</span></span>
+    </div>
+    <canvas id="canvas" width="320" height="420"></canvas>
+    <div id="ui-overlay">
+      <!-- START -->
+      <div id="screen-start" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="font-family:'DotGothic16',monospace;font-size:13px;color:#7a7772;letter-spacing:0.1em">← → キーで移動　Shiftで無敵</div>
+        <button class="btn btn-primary" onclick="startGame()">▶ スタート</button>
+      </div>
+      <!-- END -->
+      <div id="screen-end" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div id="end-title"></div>
+        <div id="score-disp"></div>
+        <div id="msg"></div>
+        <button class="btn btn-secondary" onclick="shareScore()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartGame()">リスタート</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-to">
+    <h2>HOW TO PLAY</h2>
+    <ul>
+      <li>← → キーで左右に移動して圧の言葉を避けろ</li>
+      <li>☕🍙などのアイテムを取るとHP回復</li>
+      <li>Shiftキーで一時無敵（800ms）</li>
+      <li>2分間HPが残っていればクリア</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="#">プライバシーポリシー</a>
+    <a href="#">お問い合わせ</a>
+  </div>
+</footer>
+
+<script>
+// ── constants ──────────────────────────────────────────────
+const W = 320, H = 420
+const PLAYER_Y = H - 60
+const PLAYER_W = 40, PLAYER_H = 40
+const TOTAL_TIME = 120
+
+const FUNNY_WORDS = [
+  'それアジャイルでいける？','PMいらなくない？','MVPでいいから出して','とりあえずリリースしよう','ユーザーの声最優先で',
+  'ピボットしよう','KPIどこ？','それスケールする？','資金調達考えてる？','CTOとしてどう思う？','競合調査した？',
+  '前例ある？','稟議通した？','エビデンスある？','それコンプラ的に大丈夫？','関係部署に確認して',
+  '根拠は？','責任取れる？','上に確認した？','スケジュール厳守で','標準プロセス通して',
+  'レビュー出して','どこ承認？','議事録残して','横展開しておいて','前回事例あるよね',
+  'この温度感わかる？','空気読めてる？','それ炎上しない？','期待値コントロールして','それ誰が嬉しいの？',
+  'それで勝てる？','数字弱くない？','意思決定遅くない？','本質どこ？','もう一段上ない？',
+  'なんでできないの？','普通わかるよね','やる気ある？','前にも言ったよね','それ常識だよ',
+  '給料分働いてる？','期待外れだね','雑すぎる','センスないね','誰でもできるよこれ',
+  '言い訳しないで','責任どうするの','他の人はできてるよ','これでプロ？','時間無駄にしないで',
+  '録音してないよな？','それ新人でもできるよ','2回目はないからね？','AIと交代して'
+]
+const HEALS = ['☕','🍙','🛌','🍺','🧃','💊']
+const CLEAR_MSGS = ['生き残り適性あり','圧耐性：中〜高レベル','スタートアップ環境適合','大企業圧スルー成功','意思決定速度：良好','ストレス処理能力：合格','上司耐性テストクリア','プロジェクト適応可能','精神耐久：想定以上','圧環境サバイバー認定']
+const OVER_MSGS = ['君には期待してたんだけどね','まあ経験不足かな','ちょっと厳しかったか〜','向いてない人もいるから','学生気分が抜けてないね','これ社会だからさ','俺も若い頃は怒られたよ','そんなメンタルで大丈夫？','主体性が足りないかな','まあ次頑張ろうよ']
+
+// ── state ──────────────────────────────────────────────────
+let state = {}
+let rafId = null
+let spawnTimer = null
+let countdownTimer = null
+let fontReady = false
+
+function initState() {
+  return {
+    phase: 'idle', // idle | playing | end
+    playerX: W / 2 - PLAYER_W / 2,
+    bullets: [],
+    hp: 100,
+    timeLeft: TOTAL_TIME,
+    invincible: false,
+    invincibleUntil: 0,
+    keys: {},
+    lastSpawn: 0,
+    score: 0,
+    endType: null, // 'clear' | 'over'
+    endMsg: '',
+    playerEmoji: '😰',
+  }
+}
+
+// ── canvas ─────────────────────────────────────────────────
+const canvas = document.getElementById('canvas')
+const ctx = canvas.getContext('2d')
+
+// ── font preload ───────────────────────────────────────────
+document.fonts.ready.then(() => { fontReady = true; drawIdle() })
+
+// ── input ──────────────────────────────────────────────────
+window.addEventListener('keydown', e => {
+  state.keys[e.key] = true
+  if (e.key === 'Shift' && state.phase === 'playing') {
+    state.invincible = true
+    state.invincibleUntil = performance.now() + 800
+  }
+})
+window.addEventListener('keyup', e => { state.keys[e.key] = false })
+
+// ── spawn ──────────────────────────────────────────────────
+function spawnBullet() {
+  if (state.phase !== 'playing') return
+  const elapsed = TOTAL_TIME - state.timeLeft
+  const spd = 2.5 + (elapsed / TOTAL_TIME) * 4 + Math.random() * 1.5
+
+  state.bullets.push({
+    id: Math.random(),
+    x: Math.random() * (W - 110),
+    y: -40,
+    text: FUNNY_WORDS[Math.floor(Math.random() * FUNNY_WORDS.length)],
+    type: 'damage',
+    speed: spd,
+    w: 0, h: 28  // measured on first draw
+  })
+
+  if (Math.random() > 0.55) {
+    state.bullets.push({
+      id: Math.random() + 9999,
+      x: Math.random() * (W - 44),
+      y: -40,
+      text: HEALS[Math.floor(Math.random() * HEALS.length)],
+      type: 'heal',
+      speed: (spd * 0.65),
+      w: 36, h: 36
+    })
+  }
+}
+
+// ── game loop ──────────────────────────────────────────────
+let lastTs = null
+function loop(ts) {
+  if (state.phase !== 'playing') return
+  if (lastTs === null) lastTs = ts
+  const dt = Math.min(ts - lastTs, 50) // cap at 50ms to avoid big jumps
+  lastTs = ts
+
+  // invincible expiry
+  if (state.invincible && ts > state.invincibleUntil) state.invincible = false
+
+  // player movement
+  const speed = 4
+  if (state.keys['ArrowLeft'])  state.playerX = Math.max(0, state.playerX - speed)
+  if (state.keys['ArrowRight']) state.playerX = Math.min(W - PLAYER_W, state.playerX + speed)
+
+  // difficulty
+  const elapsed = TOTAL_TIME - state.timeLeft
+  const difficulty = Math.min(5, Math.floor(elapsed / 20))
+
+  // move bullets
+  const pxScale = dt / 16.67 // normalize to ~60fps
+  state.bullets = state.bullets.filter(b => b.y < H + 60)
+  state.bullets.forEach(b => { b.y += b.speed * pxScale })
+
+  // collision
+  const px = state.playerX, py = PLAYER_Y
+  state.bullets = state.bullets.filter(b => {
+    const bw = b.w || 100
+    const hitX = b.x < px + PLAYER_W && b.x + bw > px
+    const hitY = b.y < py + PLAYER_H && b.y + b.h > py
+    if (hitX && hitY) {
+      if (b.type === 'damage' && !state.invincible) {
+        state.hp = Math.max(0, state.hp - (15 + difficulty * 3))
+        if (state.hp <= 0) endGame('over')
+      }
+      if (b.type === 'heal') state.hp = Math.min(100, state.hp + 8)
+      return false
+    }
+    return true
+  })
+
+  // score
+  state.score = elapsed * 10 + difficulty * 50 + state.hp
+
+  updateHUD()
+  draw()
+  rafId = requestAnimationFrame(loop)
+}
+
+// ── draw ───────────────────────────────────────────────────
+function drawIdle() {
+  ctx.clearRect(0, 0, W, H)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, W, H)
+  // ghost player
+  ctx.globalAlpha = 0.3
+  ctx.font = '36px serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('😰', W/2, PLAYER_Y + 32)
+  ctx.globalAlpha = 1
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, W, H)
+
+  // bullets
+  ctx.textBaseline = 'middle'
+  state.bullets.forEach(b => {
+    if (b.type === 'damage') {
+      // measure text once
+      ctx.font = '11px "Noto Sans JP", sans-serif'
+      const tw = ctx.measureText(b.text).width
+      b.w = tw + 20
+      b.h = 28
+
+      const x = Math.round(b.x), y = Math.round(b.y)
+      // bubble bg
+      ctx.fillStyle = '#06C755'
+      roundRect(ctx, x, y, b.w, b.h, 10)
+      ctx.fill()
+      // text
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
+      ctx.fillText(b.text, x + b.w / 2, y + b.h / 2)
+    } else {
+      // heal emoji
+      b.w = 36; b.h = 36
+      ctx.font = '26px serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(b.text, Math.round(b.x + 18), Math.round(b.y + 22))
+    }
+  })
+
+  // player
+  ctx.font = '36px serif'
+  ctx.textAlign = 'center'
+  if (state.invincible) ctx.globalAlpha = 0.4
+  ctx.fillText('😰', Math.round(state.playerX + PLAYER_W / 2), PLAYER_Y + 32)
+  ctx.globalAlpha = 1
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.arcTo(x + w, y, x + w, y + r, r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+  ctx.lineTo(x + r, y + h)
+  ctx.arcTo(x, y + h, x, y + h - r, r)
+  ctx.lineTo(x, y + r)
+  ctx.arcTo(x, y, x + r, y, r)
+  ctx.closePath()
+}
+
+// ── HUD ────────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('hud-time').textContent = state.timeLeft
+  const hpEl = document.getElementById('hud-hp')
+  hpEl.textContent = state.hp
+  hpEl.style.color = state.hp > 50 ? '#06C755' : state.hp > 25 ? '#f59e0b' : '#e63946'
+  document.getElementById('hud-score').textContent = state.score
+}
+
+// ── game control ───────────────────────────────────────────
+function startGame() {
+  state = initState()
+  state.phase = 'playing'
+  lastTs = null
+
+  document.getElementById('screen-start').classList.add('hidden')
+  document.getElementById('screen-end').classList.add('hidden')
+
+  spawnTimer = setInterval(spawnBullet, 900)
+  countdownTimer = setInterval(() => {
+    if (state.phase !== 'playing') return
+    state.timeLeft--
+    if (state.timeLeft <= 0) endGame('clear')
+  }, 1000)
+
+  rafId = requestAnimationFrame(loop)
+}
+
+function endGame(type) {
+  state.phase = 'end'
+  state.endType = type
+  clearInterval(spawnTimer)
+  clearInterval(countdownTimer)
+  cancelAnimationFrame(rafId)
+
+  const msgs = type === 'clear' ? CLEAR_MSGS : OVER_MSGS
+  const msg = msgs[Math.floor(Math.random() * msgs.length)]
+
+  document.getElementById('end-title').textContent = type === 'clear' ? '🎉 CLEAR！' : '💀 GAME OVER'
+  document.getElementById('score-disp').textContent = 'スコア: ' + state.score
+  document.getElementById('msg').textContent = msg
+  document.getElementById('screen-end').classList.remove('hidden')
+
+  // dim canvas
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'
+  ctx.fillRect(0, 0, W, H)
+}
+
+function restartGame() {
+  document.getElementById('screen-end').classList.add('hidden')
+  document.getElementById('screen-start').classList.remove('hidden')
+  state = initState()
+  drawIdle()
+  updateHUD()
+}
+
+function shareScore() {
+  const url = window.location.href
+  const text = `圧ゲークリア！スコア:${state.score} #圧ゲー ${url}`
+  if (navigator.share) navigator.share({ title: '圧ゲー', text, url })
+  else { navigator.clipboard.writeText(text); alert('コピーしました') }
+}
+
+// ── init ───────────────────────────────────────────────────
+state = initState()
+updateHUD()
+</script>
+</body>
+</html>

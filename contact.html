@@ -3,47 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONTACT — NAMEGEN</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<title>Contact | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #080b10; --surface: #0e1318; --border: #1e2a35; --accent: #00e5ff; --text: #e8f0f8; --muted: #4a6070;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif;
-  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
-}
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background-image: linear-gradient(rgba(0,229,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.02) 1px, transparent 1px);
-  background-size: 40px 40px; pointer-events: none; z-index: 0;
-}
-.card {
-  background: var(--surface); border: 1px solid var(--border); padding: 3rem; max-width: 500px; width: 100%; text-align: center; position: relative; z-index: 10;
-}
-.logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1rem; }
-p { font-size: 0.9rem; color: var(--text); margin-bottom: 2rem; line-height: 1.6; }
-.btn {
-  display: inline-block; font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.15em;
-  padding: 0.8rem 2rem; background: var(--accent); color: var(--bg); text-decoration: none; transition: all 0.2s;
-}
-.btn:hover { box-shadow: 0 0 20px rgba(0,229,255,0.4); transform: translateY(-1px); }
-.note { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 1.5rem; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #06C755; --tag-bg: #edeae4;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  nav { display: flex; gap: 24px; align-items: center; }
+  nav a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  nav a:hover { color: var(--text); }
+  .page-wrap { max-width: 600px; margin: 0 auto; padding: 56px 24px 0; }
+  .eyebrow { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-family: 'DotGothic16', monospace; font-size: 32px; margin-bottom: 12px; letter-spacing: 0.03em; }
+  .sub { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 40px; }
+  .form-group { margin-bottom: 24px; }
+  label { display: block; font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+  input, select, textarea {
+    width: 100%; padding: 10px 14px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 2px; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--text);
+    outline: none; transition: border-color 0.12s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--text); }
+  textarea { resize: vertical; min-height: 140px; }
+  .submit-btn {
+    font-family: 'DotGothic16', monospace; font-size: 13px;
+    padding: 11px 32px; background: var(--text); color: var(--surface);
+    border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.1em;
+    transition: opacity 0.12s;
+  }
+  .submit-btn:hover { opacity: 0.75; }
+  .note { font-size: 12px; color: var(--muted); line-height: 1.8; margin-top: 24px; }
+  footer { max-width: 600px; margin: 64px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+  #thanks { display:none; background:var(--surface); border:1.5px solid var(--accent); border-radius:4px; padding:24px; text-align:center; }
+  #thanks .big { font-family:'DotGothic16',monospace; font-size:20px; margin-bottom:8px; }
+  #thanks .small { font-size:13px; color:var(--muted); }
 </style>
-<script>
-// 2秒後にGoogleフォームへ自動リダイレクト
-setTimeout(function(){
-  window.location.href = "https://forms.gle/ajTUgHPwJp9qMwGH7";
-}, 2000);
-</script>
 </head>
 <body>
-<div class="card">
-  <div class="logo">REDIRECTING</div>
-  <p>お問い合わせフォーム（Google Forms）へ移動しています。<br>画面が切り替わらない場合は、下のボタンをクリックしてください。</p>
-  <a href="https://forms.gle/ajTUgHPwJp9qMwGH7" class="btn">OPEN FORM</a>
-  <div class="note">// EXTERNAL LINK NETWORK</div>
+<header>
+  <a href="index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <nav>
+    <a href="index.html">ゲーム一覧</a>
+    <a href="industry.html">業界版</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>
+</header>
+
+<div class="page-wrap">
+  <div class="eyebrow">CONTACT</div>
+  <h1>お問い合わせ</h1>
+  <p class="sub">掲載・取材・コラボ・業界あるあるのネタ提供など、お気軽にどうぞ。<br>通常2〜3営業日以内にご返信します。</p>
+
+  <div id="form-area">
+    <div class="form-group">
+      <label>お名前 / NAME</label>
+      <input type="text" id="f-name" placeholder="山田 太郎">
+    </div>
+    <div class="form-group">
+      <label>メールアドレス / EMAIL</label>
+      <input type="email" id="f-email" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label>お問い合わせ種別 / TYPE</label>
+      <select id="f-type">
+        <option value="">選択してください</option>
+        <option>掲載・広告について</option>
+        <option>取材・メディア</option>
+        <option>ゲームコラボ・提案</option>
+        <option>業界ネタ提供</option>
+        <option>不具合報告</option>
+        <option>その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>内容 / MESSAGE</label>
+      <textarea id="f-msg" placeholder="ご自由にどうぞ。業界あるあるのネタ提供も大歓迎です！"></textarea>
+    </div>
+    <button class="submit-btn" onclick="sendForm()">▶ 送信する</button>
+    <p class="note">※ 本フォームはデモです。実際には送信されません。<br>※ ご入力いただいた情報は <a href="privacy.html" style="color:var(--accent)">プライバシーポリシー</a> に基づき管理します。</p>
+  </div>
+
+  <div id="thanks">
+    <div class="big">✅ 送信しました</div>
+    <div class="small">お問い合わせありがとうございます。2〜3営業日以内にご返信します。</div>
+  </div>
 </div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="contact.html">お問い合わせ</a>
+  </div>
+</footer>
+
+<script>
+function sendForm() {
+  const name = document.getElementById('f-name').value.trim()
+  const email = document.getElementById('f-email').value.trim()
+  const type = document.getElementById('f-type').value
+  const msg = document.getElementById('f-msg').value.trim()
+  if (!name || !email || !type || !msg) { alert('すべての項目を入力してください'); return }
+  document.getElementById('form-area').style.display = 'none'
+  document.getElementById('thanks').style.display = 'block'
+}
+</script>
 </body>
 </html>

@@ -3,39 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABOUT — NAMEGEN</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<title>About | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #080b10; --surface: #0e1318; --border: #1e2a35; --accent: #00e5ff; --text: #e8f0f8; --muted: #4a6070;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; padding: 4rem 2rem; }
-main { max-width: 600px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); padding: 3rem; }
-.title { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-.meta-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.2rem; margin-top: 1.5rem; }
-.meta-val { font-size: 1rem; font-weight: 700; }
-.meta-val a { color: var(--accent); text-decoration: none; }
-.meta-val a:hover { text-decoration: underline; }
-p { font-size: 0.88rem; color: #b2c0cc; line-height: 1.7; margin-top: 0.5rem; }
-.back { display: inline-block; margin-top: 3rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); text-decoration: none; }
-.back:hover { color: var(--accent); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #06C755; --tag-bg: #edeae4;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  nav { display: flex; gap: 24px; align-items: center; }
+  nav a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  nav a:hover { color: var(--text); }
+  .page-wrap { max-width: 680px; margin: 0 auto; padding: 56px 24px 0; }
+  .eyebrow { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-family: 'DotGothic16', monospace; font-size: 32px; margin-bottom: 32px; letter-spacing: 0.03em; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .section-title { font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 16px; }
+  p { font-size: 14px; line-height: 2; color: var(--text); margin-bottom: 16px; }
+  .stat-row { display: flex; gap: 32px; flex-wrap: wrap; margin: 24px 0; }
+  .stat { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px 24px; }
+  .stat-num { font-family: 'DotGothic16', monospace; font-size: 28px; display: block; }
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+  footer { max-width: 680px; margin: 64px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
 </style>
 </head>
 <body>
-<main>
-  <div class="title">ABOUT CREATOR</div>
-  
-  <div class="meta-label">Project Name</div>
-  <div class="meta-val">NAMEGEN Project</div>
+<header>
+  <a href="index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <nav>
+    <a href="index.html">ゲーム一覧</a>
+    <a href="industry.html">業界版</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>
+</header>
 
-  <div class="meta-label">Description</div>
-  <p>ゲームID、VTuber名、クラン名など、オンライン上のあらゆるアイデンティティを秒速で生成するジェネレーターツール。シンプル、実用的、そしてクールなネーミングをサポートします。</p>
+<div class="page-wrap">
+  <div class="eyebrow">ABOUT</div>
+  <h1>圧ゲー<span style="color:var(--accent)">.</span>jpとは</h1>
 
-  <div class="meta-label">Contact Email</div>
-  <div class="meta-val"><a href="mailto:100makeniki@gmail.com">100makeniki@gmail.com</a></div>
+  <div class="section-title">CONCEPT</div>
+  <p>圧ゲー.jpは、働く人のストレスをゲームに変えるブラウザゲームポータルです。</p>
+  <p>理不尽な上司、終わらない会議、謎の申請フォーム——誰もが経験する「会社あるある」を、笑いながら発散できるミニゲームに変換しました。スマホ・PCどちらでも、登録なし・無料で遊べます。</p>
+  <p>笑えるストレスは、笑って流す。そのための場所です。</p>
 
-  <a href="namegen.html" class="back">&lt; BACK TO GENERATOR</a>
-</main>
+  <hr class="divider">
+  <div class="section-title">NUMBERS</div>
+  <div class="stat-row">
+    <div class="stat">
+      <span class="stat-num">1</span>
+      <span class="stat-label">GAMES</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">12,483</span>
+      <span class="stat-label">TOTAL PLAYS</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">8</span>
+      <span class="stat-label">INDUSTRIES (予定)</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">ROADMAP</div>
+  <p>現在は「会社あるある」シリーズを展開中。2025年下半期より、医療・航空・飲食など<strong>業界特化あるある</strong>シリーズの公開を予定しています。各業界のリアルな理不尽を、その業界出身のクリエイターと一緒にゲーム化します。</p>
+
+  <hr class="divider">
+  <div class="section-title">CONTACT</div>
+  <p>掲載・取材・コラボのご相談は <a href="contact.html" style="color:var(--accent)">お問い合わせページ</a> からどうぞ。</p>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="contact.html">お問い合わせ</a>
+  </div>
+</footer>
 </body>
 </html>

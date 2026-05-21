@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>業界あるあるゲーム集 | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+    --text: #1a1917; --muted: #7a7772; --accent: #06C755; --tag-bg: #edeae4;
+    --danger: #e63946;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+
+  /* ── HEADER ── */
+  header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  nav { display: flex; gap: 24px; align-items: center; }
+  nav a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
+  nav a:hover { color: var(--text); }
+  nav a.active { color: var(--text); font-weight: 700; }
+
+  /* ── HERO ── */
+  .hero { max-width: 860px; margin: 56px auto 48px; padding: 0 24px; }
+  .hero-eyebrow { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-family: 'DotGothic16', monospace; font-size: clamp(28px, 4.5vw, 48px); line-height: 1.2; letter-spacing: 0.02em; margin-bottom: 14px; }
+  h1 .hl { color: var(--accent); }
+  .hero-sub { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 540px; }
+
+  /* ── INDUSTRY NAV ── */
+  .industry-nav { max-width: 860px; margin: 0 auto 40px; padding: 0 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .ind-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 2px; background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.1s; letter-spacing: 0.03em; display: flex; align-items: center; gap: 4px; }
+  .ind-btn:hover, .ind-btn.active { background: var(--text); color: var(--surface); border-color: var(--text); }
+
+  /* ── SECTION LABEL ── */
+  .section-label { max-width: 860px; margin: 0 auto 20px; padding: 0 24px; font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── INDUSTRY BLOCK ── */
+  .industry-block { max-width: 860px; margin: 0 auto 56px; padding: 0 24px; }
+  .ind-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1.5px solid var(--border); }
+  .ind-icon { font-size: 28px; width: 48px; height: 48px; background: var(--tag-bg); border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ind-name { font-family: 'DotGothic16', monospace; font-size: 18px; letter-spacing: 0.03em; }
+  .ind-tagline { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .ind-count { margin-left: auto; font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; white-space: nowrap; }
+
+  /* ── GAME GRID ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; cursor: pointer; transition: transform 0.12s, border-color 0.12s; text-decoration: none; color: inherit; display: block; }
+  .card:hover { transform: translateY(-2px); border-color: var(--text); }
+  .card.coming { cursor: default; opacity: 0.55; pointer-events: none; }
+  .card.coming:hover { transform: none; border-color: var(--border); }
+  .card-thumb { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 44px; border-bottom: 1px solid var(--border); position: relative; background: var(--tag-bg); }
+  .card.coming .card-thumb { filter: grayscale(1); }
+  .badge { position: absolute; top: 8px; right: 8px; font-size: 10px; font-family: 'DotGothic16', monospace; padding: 2px 7px; letter-spacing: 0.08em; color: #fff; }
+  .badge-new { background: var(--danger); }
+  .badge-soon { background: var(--muted); }
+  .badge-pick { background: var(--accent); }
+  .card-body { padding: 12px 14px 14px; }
+  .card-title { font-family: 'DotGothic16', monospace; font-size: 14px; margin-bottom: 6px; letter-spacing: 0.02em; }
+  .card-desc { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .card-tag { font-size: 10px; padding: 2px 7px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); letter-spacing: 0.04em; }
+  .play-btn { display: inline-block; margin-top: 10px; font-family: 'DotGothic16', monospace; font-size: 11px; padding: 6px 16px; background: var(--text); color: var(--surface); letter-spacing: 0.1em; border-radius: 2px; }
+
+  /* ── AD ── */
+  .ad-wrap { max-width: 860px; margin: 0 auto 40px; padding: 0 24px; }
+  .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+
+  footer { max-width: 860px; margin: 64px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <nav>
+    <a href="index.html">ゲーム一覧</a>
+    <a href="industry.html" class="active">業界版</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">INDUSTRY EDITION</div>
+  <h1>あの業界の<span class="hl">理不尽</span>を、<br>ゲームにした。</h1>
+  <p class="hero-sub">医療・看護・介護・航空・保育・製造・飲食・コンビニ。8業界のリアルすぎるあるあるを、それぞれのゲームに落とし込んだ。笑えたら少し楽になる。</p>
+</section>
+
+<div class="ad-wrap">
+  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
+</div>
+
+<!-- INDUSTRY FILTER NAV -->
+<div class="industry-nav">
+  <button class="ind-btn active" onclick="filterAll(this)">すべて</button>
+  <button class="ind-btn" onclick="filterInd(this,'doctor')">🏥 医者</button>
+  <button class="ind-btn" onclick="filterInd(this,'nurse')">💉 看護</button>
+  <button class="ind-btn" onclick="filterInd(this,'care')">🤲 介護</button>
+  <button class="ind-btn" onclick="filterInd(this,'aviation')">✈️ 航空</button>
+  <button class="ind-btn" onclick="filterInd(this,'nursery')">🧸 保育</button>
+  <button class="ind-btn" onclick="filterInd(this,'factory')">🏭 製造</button>
+  <button class="ind-btn" onclick="filterInd(this,'restaurant')">🍜 飲食</button>
+  <button class="ind-btn" onclick="filterInd(this,'convenience')">🏪 コンビニ</button>
+</div>
+
+<!-- ══ 医者 ══ -->
+<div class="industry-block" data-industry="doctor">
+  <div class="ind-header">
+    <div class="ind-icon">🏥</div>
+    <div>
+      <div class="ind-name">医者</div>
+      <div class="ind-tagline">外来120人・救急・カンファ——全部今日中らしい</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🩺<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">外来120人さばき</div>
+        <div class="card-desc">次々と来る患者の訴えを5秒で診断しろ。「疲れた」「なんか変」の主訴を捌くタイミングゲーム。</div>
+        <div class="card-meta"><span class="card-tag">タイミング</span><span class="card-tag">クリッカー</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">📋<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">カルテ記録地獄</div>
+        <div class="card-desc">電子カルテが固まる瞬間を乗り越えろ。ログアウト・フリーズ・入力欄消失の三重苦。</div>
+        <div class="card-meta"><span class="card-tag">パズル</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">😤<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">モンスター患者をなだめろ</div>
+        <div class="card-desc">「ネットで調べたら違うって書いてた」。クレームの言葉を選択肢で切り抜けるクイズゲーム。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 看護 ══ -->
+<div class="industry-block" data-industry="nurse">
+  <div class="ind-header">
+    <div class="ind-icon">💉</div>
+    <div>
+      <div class="ind-name">看護</div>
+      <div class="ind-tagline">ナースコール・採血・記録、全部同時に来る</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🔔<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">ナースコール連打サバイバー</div>
+        <div class="card-desc">鳴り止まないナースコール。優先度を判断しながらすべてに応答しろ。「トイレ」が連続で来る。</div>
+        <div class="card-meta"><span class="card-tag">優先度判断</span><span class="card-tag">クリッカー</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">💉<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">採血一発必中</div>
+        <div class="card-desc">血管が細い患者に一発で刺さるか。タイミングと手の震えを制御するスキルゲーム。</div>
+        <div class="card-meta"><span class="card-tag">タイミング</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🌙<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">夜勤16時間耐久</div>
+        <div class="card-desc">夜中2時、廊下で倒れそうになりながら急変対応。眠気ゲージをコーヒーで抑え続けろ。</div>
+        <div class="card-meta"><span class="card-tag">耐久</span><span class="card-tag">シミュレーション</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 介護 ══ -->
+<div class="industry-block" data-industry="care">
+  <div class="ind-header">
+    <div class="ind-icon">🤲</div>
+    <div>
+      <div class="ind-name">介護</div>
+      <div class="ind-tagline">腰が限界でも「ありがとう」の一言で続けてしまう</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🛁<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">入浴介助タイムアタック</div>
+        <div class="card-desc">10人分の入浴を時間内に安全に終わらせろ。焦ると転倒リスクが上がる。タイム最優先は禁物。</div>
+        <div class="card-meta"><span class="card-tag">タイムアタック</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">😇<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">徘徊する利用者を見つけろ</div>
+        <div class="card-desc">気づいたら消えている利用者。施設マップを素早く探索して安全に誘導。夜間難易度は鬼。</div>
+        <div class="card-meta"><span class="card-tag">探索</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">💬<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">クレーム家族対応クイズ</div>
+        <div class="card-desc">「なぜ転んだんですか」「食事量が減った気がします」。正解のない問いに言葉を選べ。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">コミュニケーション</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 航空 ══ -->
+<div class="industry-block" data-industry="aviation">
+  <div class="ind-header">
+    <div class="ind-icon">✈️</div>
+    <div>
+      <div class="ind-name">航空</div>
+      <div class="ind-tagline">笑顔は義務、マニュアルは200ページ</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🧳<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">手荷物オーバーウェイト交渉</div>
+        <div class="card-desc">23kgを2g超えただけで100ドル請求。怒るお客様をルールの範囲内でなだめる言葉を選べ。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">接客</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">⚡<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">乱気流サービス継続</div>
+        <div class="card-desc">揺れる機内でコーヒーをこぼさずに提供しろ。揺れのタイミングを読みながら歩き続ける。</div>
+        <div class="card-meta"><span class="card-tag">バランス</span><span class="card-tag">タイミング</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">😴<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">時差12時間スタンバイ</div>
+        <div class="card-desc">現地時間AM3時、乗務前のスタンバイ中。眠気をおさえて保安検査を突破しろ。</div>
+        <div class="card-meta"><span class="card-tag">耐久</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 保育 ══ -->
+<div class="industry-block" data-industry="nursery">
+  <div class="ind-header">
+    <div class="ind-icon">🧸</div>
+    <div>
+      <div class="ind-name">保育</div>
+      <div class="ind-tagline">25人が全員「先生ー！」と同時に叫ぶ</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">👶<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">お昼寝全員成功チャレンジ</div>
+        <div class="card-desc">25人を同時に寝かしつけろ。1人起きると連鎖する。背中トントンのタイミングを見極めろ。</div>
+        <div class="card-meta"><span class="card-tag">マルチタスク</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🎨<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">連絡帳30冊タイピング</div>
+        <div class="card-desc">今日の一言を30通り書き分けろ。「元気でした」は使い回し禁止。保護者目線を忘れずに。</div>
+        <div class="card-meta"><span class="card-tag">タイピング</span><span class="card-tag">言語</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🏃<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">脱走児ダッシュキャッチ</div>
+        <div class="card-desc">園庭の端まで全力ダッシュする子どもをつかまえろ。残り24人は目を離せない。</div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">マルチタスク</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 製造 ══ -->
+<div class="industry-block" data-industry="factory">
+  <div class="ind-header">
+    <div class="ind-icon">🏭</div>
+    <div>
+      <div class="ind-name">製造</div>
+      <div class="ind-tagline">ライン止めたら終わり、でも品質も妥協するな</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">⚙️<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">ライン不具合を3秒で直せ</div>
+        <div class="card-desc">ラインが止まるたびに上司の視線が刺さる。原因を素早く見つけ、5分以内に復旧させろ。</div>
+        <div class="card-meta"><span class="card-tag">パズル</span><span class="card-tag">タイムアタック</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🔍<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">目視検査不良品探し</div>
+        <div class="card-desc">高速で流れてくる部品から1mm以下の傷を見つけろ。集中力が切れたら見逃す。</div>
+        <div class="card-meta"><span class="card-tag">観察</span><span class="card-tag">耐久</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">📊<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">カイゼン提案書を通せ</div>
+        <div class="card-desc">5分で思いついた改善案を稟議に上げろ。根拠・コスト・効果を数値で示せと言われる。</div>
+        <div class="card-meta"><span class="card-tag">シミュレーション</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 飲食 ══ -->
+<div class="industry-block" data-industry="restaurant">
+  <div class="ind-header">
+    <div class="ind-icon">🍜</div>
+    <div>
+      <div class="ind-name">飲食</div>
+      <div class="ind-tagline">ランチ12時、全テーブル同時に「すみません」</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🍳<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">ランチピーク1人厨房</div>
+        <div class="card-desc">同僚が急に休んだ。オーダーが積み上がる1人厨房で、全品15分以内に提供しろ。</div>
+        <div class="card-meta"><span class="card-tag">マルチタスク</span><span class="card-tag">タイムアタック</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🙅<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">無茶オーダー断り方クイズ</div>
+        <div class="card-desc">「アレルギーあるけどアレルギー対応できる？」「閉店5分前にコースで」。断り方を選択肢で選べ。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">接客</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">⭐<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">食べログ星1レビュー対応</div>
+        <div class="card-desc">「スープがぬるかった（実測73℃）」。不当レビューへの返信文を炎上させずに書き切れ。</div>
+        <div class="card-meta"><span class="card-tag">タイピング</span><span class="card-tag">言語</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ コンビニ ══ -->
+<div class="industry-block" data-industry="convenience">
+  <div class="ind-header">
+    <div class="ind-icon">🏪</div>
+    <div>
+      <div class="ind-name">コンビニ</div>
+      <div class="ind-tagline">1人で全部やれ、笑顔で</div>
+    </div>
+    <div class="ind-count">3 GAMES</div>
+  </div>
+  <div class="grid">
+    <div class="card coming">
+      <div class="card-thumb">🎰<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">宝くじ受付ラッシュ</div>
+        <div class="card-desc">年末宝くじ解禁日。行列をさばきながら番号確認・当選照合・レジ対応を同時に回せ。</div>
+        <div class="card-meta"><span class="card-tag">マルチタスク</span><span class="card-tag">クリッカー</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">🌭<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">フライヤー商品売り切れ回避</div>
+        <div class="card-desc">補充タイミングを誤ると廃棄過多か品切れ。夕方17時の揚げ物需要予測タイムアタック。</div>
+        <div class="card-meta"><span class="card-tag">シミュレーション</span></div>
+      </div>
+    </div>
+    <div class="card coming">
+      <div class="card-thumb">😤<span class="badge badge-soon">COMING SOON</span></div>
+      <div class="card-body">
+        <div class="card-title">深夜クレーマー接客ゲーム</div>
+        <div class="card-desc">深夜1人勤務に来る常連クレーマー。声を荒げずに、でも引かずに対応しろ。録音されてる。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">接客</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ad-wrap">
+  <div class="ad-slot">広告 / AdSense Rectangle (336×280)</div>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="contact.html">お問い合わせ</a>
+    <a href="index.html">← 会社版へ</a>
+  </div>
+</footer>
+
+<script>
+  function filterAll(btn) {
+    document.querySelectorAll('.ind-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    document.querySelectorAll('.industry-block').forEach(b => b.style.display = '')
+  }
+  function filterInd(btn, ind) {
+    document.querySelectorAll('.ind-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    document.querySelectorAll('.industry-block').forEach(b => {
+      b.style.display = b.dataset.industry === ind ? '' : 'none'
+    })
+  }
+</script>
+</body>
+</html>
