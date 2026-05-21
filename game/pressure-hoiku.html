@@ -29,9 +29,9 @@
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .tag { font-size: 10px; padding: 2px 8px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); letter-spacing: 0.05em; }
   .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 32px; }
-  .game-frame { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; gap: 12px; }
+  .game-frame { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; gap: 12px; }
   #hud { display: flex; gap: 32px; font-family: 'DotGothic16', monospace; font-size: 13px; }
-  canvas { border: 2px solid var(--border); border-radius: 4px; display: block; }
+  canvas { border: 2px solid var(--border); border-radius: 4px; display: block; max-width: 100%; touch-action: none; }
   #ui-overlay { display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .btn { font-family: 'DotGothic16', monospace; font-size: 13px; padding: 8px 24px; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; }
   .btn-primary { background: #1a1917; color: #fff; border: none; }
@@ -47,6 +47,11 @@
   footer { max-width: 860px; margin: 40px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--text); }
+  .touch-controls { display: none; gap: 12px; align-items: center; justify-content: center; width: 100%; }
+  @media (pointer: coarse) { .touch-controls { display: flex; } }
+  .touch-btn { font-family: 'DotGothic16', monospace; font-size: 22px; padding: 14px 28px; border-radius: 4px; cursor: pointer; user-select: none; -webkit-user-select: none; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); active-color: var(--accent); }
+  .touch-btn:active { background: var(--tag-bg); }
+  .touch-btn-invincible { font-size: 13px; padding: 14px 18px; background: #1a1917; color: #fff; border-color: #1a1917; letter-spacing: 0.08em; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -79,9 +84,14 @@
       <span style="color:#7a7772">スコア <span id="hud-score">0</span></span>
     </div>
     <canvas id="canvas" width="320" height="420"></canvas>
+    <div class="touch-controls" id="touch-controls">
+      <button class="touch-btn" id="btn-left" ontouchstart="touchStart('left')" ontouchend="touchEnd('left')" onmousedown="touchStart('left')" onmouseup="touchEnd('left')">◀</button>
+      <button class="touch-btn touch-btn-invincible" id="btn-inv" ontouchstart="touchInvincible()" onmousedown="touchInvincible()">無敵</button>
+      <button class="touch-btn" id="btn-right" ontouchstart="touchStart('right')" ontouchend="touchEnd('right')" onmousedown="touchStart('right')" onmouseup="touchEnd('right')">▶</button>
+    </div>
     <div id="ui-overlay">
       <div id="screen-start" style="display:flex;flex-direction:column;align-items:center;gap:12px">
-        <div style="font-family:'DotGothic16',monospace;font-size:13px;color:#7a7772;letter-spacing:0.1em">← → キーで移動　Shiftで無敵</div>
+        <div style="font-family:'DotGothic16',monospace;font-size:13px;color:#7a7772;letter-spacing:0.1em" id="ctrl-hint">← → キーで移動　Shiftで無敵</div>
         <button class="btn btn-primary" onclick="startGame()">▶ スタート</button>
       </div>
       <div id="screen-end" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px">
@@ -97,9 +107,9 @@
   <div class="how-to">
     <h2>HOW TO PLAY</h2>
     <ul>
-      <li>← → キーで左右に移動して圧の言葉を避けろ</li>
+      <li>← → キー（PC）または画面下のボタン（スマホ）で左右移動</li>
       <li>🍵🍰などのアイテムを取るとHP回復</li>
-      <li>Shiftキーで一時無敵（800ms）</li>
+      <li>Shiftキー or 無敵ボタンで一時無敵（800ms）</li>
       <li>2分間HPが残っていればクリア</li>
     </ul>
   </div>
