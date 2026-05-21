@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>モンスターペイシェントから逃げろ | 圧ゲー.jp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f3ee; --surface: #ffffff; --border: #ddd9d0;
+  --text: #1a1917; --muted: #7a7772; --accent: #e63946; --tag-bg: #edeae4;
+}
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
+header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
+.logo span { color: var(--accent); }
+.back-link { font-size: 13px; color: var(--muted); text-decoration: none; }
+.back-link:hover { color: var(--text); }
+.page-wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 0; }
+.breadcrumb { font-size: 11px; color: var(--muted); margin-bottom: 24px; }
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.game-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 32px; }
+.game-icon { font-size: 48px; width: 72px; height: 72px; background: var(--tag-bg); border: 1.5px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.game-meta h1 { font-family: 'DotGothic16', monospace; font-size: 24px; margin-bottom: 6px; letter-spacing: 0.03em; }
+.game-meta p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 2px 8px; background: var(--tag-bg); border-radius: 2px; color: var(--muted); }
+.ad-slot { border: 1px dashed var(--border); height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); margin-bottom: 32px; border-radius: 2px; }
+
+/* ── GAME FRAME ───────────────────────── */
+.game-frame {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px;
+  padding: 16px; display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 32px; gap: 0; user-select: none;
+}
+
+/* HUD */
+#hud { display: flex; width: 100%; max-width: 360px; align-items: center; margin-bottom: 10px; gap: 12px; }
+#hud-q { font-family: 'DotGothic16', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.anger-bar-wrap { flex: 1; height: 14px; background: var(--tag-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+#anger-bar { height: 100%; width: 0%; background: var(--accent); border-radius: 8px; transition: width 0.35s ease, background 0.35s; }
+#hud-score { font-family: 'DotGothic16', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* STAGE */
+#stage {
+  width: 100%; max-width: 360px; min-height: 420px; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* PATIENT */
+#patient-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  margin-top: 16px; margin-bottom: 8px;
+  animation: pop-in 0.3s cubic-bezier(.17,.67,.3,1.4);
+}
+@keyframes pop-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#patient-emoji { font-size: 64px; line-height: 1; }
+#patient-name { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.06em; }
+
+/* SPEECH BUBBLE */
+#bubble-wrap { position: relative; width: 100%; max-width: 300px; margin-bottom: 12px; }
+#bubble {
+  background: #fff3f3; border: 1.5px solid var(--accent); border-radius: 12px;
+  padding: 10px 14px; font-family: 'DotGothic16', monospace; font-size: 14px;
+  text-align: center; line-height: 1.5; color: var(--text);
+  animation: slide-down 0.25s ease;
+}
+@keyframes slide-down { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+#bubble::after {
+  content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  border: 8px solid transparent; border-bottom-color: var(--accent);
+  border-top: none; width: 0; height: 0;
+}
+
+/* CHOICES */
+#choices-wrap {
+  width: 100%; max-width: 360px; display: flex; gap: 10px;
+  margin-top: 4px;
+}
+.choice-btn {
+  flex: 1; padding: 12px 8px; border-radius: 4px; cursor: pointer;
+  font-family: 'DotGothic16', monospace; font-size: 12px; line-height: 1.5;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text);
+  text-align: center; transition: transform 0.12s, box-shadow 0.12s;
+}
+.choice-btn:active { transform: scale(0.96); }
+.choice-btn.from-left { animation: slide-from-left 0.35s cubic-bezier(.17,.67,.3,1.1); }
+.choice-btn.from-right { animation: slide-from-right 0.35s cubic-bezier(.17,.67,.3,1.1); }
+@keyframes slide-from-left { from { transform: translateX(-120px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slide-from-right { from { transform: translateX(120px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.choice-btn.correct { background: #e6f9ee; border-color: #06C755; color: #1a5c2a; }
+.choice-btn.wrong { background: #ffeaea; border-color: var(--accent); color: #7a1a1a; }
+.choice-btn:disabled { cursor: default; }
+
+/* FEEDBACK */
+#feedback-msg {
+  font-family: 'DotGothic16', monospace; font-size: 13px;
+  min-height: 20px; text-align: center; margin-top: 10px; letter-spacing: 0.04em;
+}
+
+/* SCREENS */
+.screen { display: none; flex-direction: column; align-items: center; gap: 14px; padding: 24px 0; text-align: center; }
+.screen.active { display: flex; }
+.screen-title { font-family: 'DotGothic16', monospace; font-size: 22px; }
+.screen-sub { font-size: 13px; color: var(--muted); line-height: 1.8; }
+.btn { font-family: 'DotGothic16', monospace; font-size: 13px; padding: 9px 28px; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; }
+.btn-primary { background: #1a1917; color: #fff; border: none; }
+.btn-secondary { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+.btn:hover { opacity: 0.75; }
+
+/* SHAKE */
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+.shake { animation: shake 0.35s ease; }
+
+/* HOW TO */
+.how-to { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-bottom: 40px; }
+.how-to h2 { font-family: 'DotGothic16', monospace; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 12px; color: var(--muted); }
+.how-to ul { list-style: none; font-size: 13px; line-height: 2.2; }
+.how-to ul li::before { content: '▸ '; color: var(--accent); }
+
+footer { max-width: 860px; margin: 40px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="logo">圧ゲー<span>.</span>jp</a>
+  <a href="../index.html" class="back-link">← ゲーム一覧</a>
+</header>
+
+<div class="page-wrap">
+  <div class="breadcrumb"><a href="../index.html">トップ</a> &nbsp;/&nbsp; モンスターペイシェントから逃げろ</div>
+  <div class="game-header">
+    <div class="game-icon">🏥</div>
+    <div class="game-meta">
+      <h1>モンスターペイシェントから逃げろ</h1>
+      <p>「俺を誰だと思ってる」「今すぐ院長を呼べ」——理不尽な要求をかわして今日も乗り切れ。</p>
+      <div class="tags"><span class="tag">選択系</span><span class="tag">全10問</span><span class="tag">無料</span><span class="tag">医療</span></div>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
+
+  <div class="game-frame">
+    <div id="hud">
+      <span id="hud-q">Q1/10</span>
+      <div class="anger-bar-wrap"><div id="anger-bar"></div></div>
+      <span id="hud-score">SCORE 0</span>
+    </div>
+
+    <div id="stage">
+
+      <div class="screen active" id="screen-start">
+        <div style="font-size:56px">🏥</div>
+        <div class="screen-title">モンスターペイシェント</div>
+        <div class="screen-sub">迫りくる理不尽な要求に<br>正しい対応を選び続けろ。<br>怒りゲージがMAXになったら終了。</div>
+        <button class="btn btn-primary" onclick="startGame()">▶ スタート</button>
+      </div>
+
+      <div class="screen" id="screen-game">
+        <div id="patient-wrap">
+          <div id="patient-emoji">😤</div>
+          <div id="patient-name">TYPE-A</div>
+        </div>
+        <div id="bubble-wrap">
+          <div id="bubble">「院長を呼べ！」</div>
+        </div>
+        <div id="choices-wrap">
+          <button class="choice-btn from-left" id="choice-left">選択肢A</button>
+          <button class="choice-btn from-right" id="choice-right">選択肢B</button>
+        </div>
+        <div id="feedback-msg"></div>
+      </div>
+
+      <div class="screen" id="screen-clear">
+        <div style="font-size:52px">🎉</div>
+        <div class="screen-title">今日も乗り切った</div>
+        <div id="clear-score" style="font-family:'DotGothic16',monospace;font-size:14px;color:var(--muted)"></div>
+        <div id="clear-msg" style="font-size:13px;color:var(--muted)"></div>
+        <button class="btn btn-secondary" onclick="shareResult()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartGame()">もう一度</button>
+      </div>
+
+      <div class="screen" id="screen-gameover">
+        <div style="font-size:52px">💀</div>
+        <div class="screen-title">GAME OVER</div>
+        <div id="go-patient" style="font-family:'DotGothic16',monospace;font-size:13px;color:var(--accent)"></div>
+        <div id="go-msg" style="font-size:13px;color:var(--muted);line-height:1.8"></div>
+        <div id="go-score" style="font-family:'DotGothic16',monospace;font-size:13px;color:var(--muted)"></div>
+        <button class="btn btn-secondary" onclick="shareGameOver()">SNS共有</button>
+        <button class="btn btn-primary" onclick="restartGame()">もう一度</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="how-to">
+    <h2>HOW TO PLAY</h2>
+    <ul>
+      <li>問題ごとにモンスターペイシェントが登場する</li>
+      <li>左右に現れる2択をタップして正しい対応を選べ</li>
+      <li>間違えると怒りゲージが上昇、MAXでゲームオーバー</li>
+      <li>全10問乗り切れば生還</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 圧ゲー.jp</span>
+  <div style="display:flex;gap:20px;">
+    <a href="../privacy.html">プライバシーポリシー</a>
+    <a href="../contact.html">お問い合わせ</a>
+  </div>
+</footer>
+
+<script>
+const PATIENTS = [
+  { emoji:'👴', name:'クレーマー田中（67）', intro:'「俺は何十年もここに来てるんだ」', color:'#e63946' },
+  { emoji:'👩', name:'モンスター佐藤（42）', intro:'「私、医療に詳しいんで」', color:'#f97316' },
+  { emoji:'👨‍💼', name:'エリート山田（51）', intro:'「俺を誰だと思ってる」', color:'#7c3aed' },
+  { emoji:'📱', name:'SNS投稿マン（28）', intro:'「今すぐ投稿しますよ？」', color:'#0284c7' },
+  { emoji:'👩‍⚕️', name:'自称医師の妻（45）', intro:'「夫が医者なんですけど」', color:'#db2777' },
+  { emoji:'🧓', name:'お気持ち奥様（73）', intro:'「先生の態度が気に食わない」', color:'#d97706' },
+  { emoji:'📋', name:'調査員ぶり（39）', intro:'「カルテ全部見せてもらいます」', color:'#065f46' },
+  { emoji:'🤧', name:'WebMD信者（33）', intro:'「ネットで調べたんですが」', color:'#1e40af' },
+  { emoji:'💢', name:'即院長呼び太郎（55）', intro:'「今すぐ院長を呼べ！」', color:'#be123c' },
+  { emoji:'🎭', name:'演技派ペイシェント（47）', intro:'「もう死にそうです（元気）」', color:'#6b21a8' },
+]
+
+const ALL_QUESTIONS = [
+  {
+    patientIdx: 0,
+    q: '「先生の説明が意味わからん。もっとわかりやすく言え！」',
+    choices: ['「申し訳ございません。どの部分が不明でしたか？」', '「これ以上簡単にはできません」'],
+    correct: 0, anger_wrong: 30,
+    feedback_ok: '落ち着いて確認。これが正解。',
+    feedback_ng: '火に油。怒りゲージ急上昇。',
+  },
+  {
+    patientIdx: 1,
+    q: '「ネットで調べたら違う薬が出てたんですけど、そっちにしてもらえますか？」',
+    choices: ['「患者様の状態を踏まえて処方しています。気になる点があればご説明します」', '「ネットの情報は正確ではないので無視してください」'],
+    correct: 0, anger_wrong: 25,
+    feedback_ok: '否定せず、理由を説明。完璧。',
+    feedback_ng: 'ネットを馬鹿にするのはNG。倍返しされる。',
+  },
+  {
+    patientIdx: 2,
+    q: '「俺は議員の知り合いがいるんだが、それでもこの対応か？」',
+    choices: ['「皆様に同じ対応をしております。お待ちいただけますか」', '「それは関係ありません」'],
+    correct: 0, anger_wrong: 35,
+    feedback_ok: '毅然と、でも丁寧に。教科書通り。',
+    feedback_ng: '正論でも言い方が刺さる。ゲージ上昇。',
+  },
+  {
+    patientIdx: 3,
+    q: '「待ち時間が長すぎる。今すぐ診てもらわないとSNSに書くぞ」',
+    choices: ['「大変お待たせしています。順番に対応しておりますのでもう少々お待ちください」', '「SNSに書くのはご自由ですが、順番は変えられません」'],
+    correct: 0, anger_wrong: 30,
+    feedback_ok: '謝罪＋説明でゲージ抑制。',
+    feedback_ng: '正論だが挑発になる。SNSに書かれるフラグ。',
+  },
+  {
+    patientIdx: 4,
+    q: '「この薬、副作用がひどい。絶対に処方ミスだ。訴えますよ」',
+    choices: ['「副作用について詳しくお聞かせください。主治医に確認いたします」', '「副作用は説明した通りです」'],
+    correct: 0, anger_wrong: 35,
+    feedback_ok: '冷静に受け止め、確認へ。これが正解。',
+    feedback_ng: '「説明した」は責任転嫁に聞こえる。アウト。',
+  },
+  {
+    patientIdx: 5,
+    q: '「先生の態度が気に食わない。謝れ」',
+    choices: ['「不快に思われたなら申し訳ございません。具体的にお聞かせいただけますか」', '「何が問題だったか教えていただけますか」'],
+    correct: 0, anger_wrong: 20,
+    feedback_ok: 'まず謝罪、そして聴く。これ一択。',
+    feedback_ng: '謝罪なしの質問は対立姿勢に見える。',
+  },
+  {
+    patientIdx: 6,
+    q: '「カルテを全部見せろ。患者の権利だろ」',
+    choices: ['「開示請求の手続きをご案内します」', '「院長の許可が必要なので今はお見せできません」'],
+    correct: 0, anger_wrong: 25,
+    feedback_ok: '権利は認めつつ手続きへ誘導。正解。',
+    feedback_ng: '院長責任転嫁はその場しのぎ。後で倍返し。',
+  },
+  {
+    patientIdx: 7,
+    q: '「こんな小さい病院じゃなくて大学病院に紹介してもらえないの」',
+    choices: ['「症状を確認した上で、必要があればご紹介いたします」', '「当院で十分対応できます」'],
+    correct: 0, anger_wrong: 20,
+    feedback_ok: '否定せず、条件付きで対応。スマート。',
+    feedback_ng: '「十分」という断言が反感を買う。',
+  },
+  {
+    patientIdx: 8,
+    q: '「今すぐ院長を呼べ！ お前では話にならない！」',
+    choices: ['「院長に取り次ぎます。少々お待ちください」', '「私が担当ですので、私にお申し付けください」'],
+    correct: 0, anger_wrong: 40,
+    feedback_ok: '要求を受け入れてエスカレーション。正解。',
+    feedback_ng: '「私が担当」は炎上フラグ。即MAX行き。',
+  },
+  {
+    patientIdx: 9,
+    q: '「もうずっと具合が悪くて、先生たちが信用できない」',
+    choices: ['「それは辛かったですね。もう少し詳しく教えていただけますか」', '「検査結果には問題がありません」'],
+    correct: 0, anger_wrong: 25,
+    feedback_ok: '共感ファースト。これが全ての基本。',
+    feedback_ng: '検査結果を盾にすると「わかってもらえない」になる。',
+  },
+]
+
+const CLEAR_MSGS = ['モンスター対応スキル：S級認定','怒りゲージ制御完璧','今日も無事に帰宅できた','クレーム対応マニュアル不要','鉄のメンタルで全員撃退','院長に報告不要で乗り切った']
+const GO_MSGS = ['クレーム対応研修、もう一回受けてきて','こういうときのためのマニュアルがあります','深呼吸してからもう一度','怒りに怒りで返すのは禁物','今日の反省を明日に活かせ']
+
+let questions = [], qIdx = 0, angerPct = 0, score = 0, answered = false
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5) }
+function initState() { questions = shuffle(ALL_QUESTIONS).slice(0, 10); qIdx = 0; angerPct = 0; score = 0; answered = false; }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+function renderQuestion() {
+  const q = questions[qIdx]
+  const p = PATIENTS[q.patientIdx]
+  answered = false
+  document.getElementById('hud-q').textContent = `Q${qIdx+1}/10`
+  document.getElementById('hud-score').textContent = `SCORE ${score}`
+  updateAngerBar()
+
+  const pw = document.getElementById('patient-wrap')
+  pw.style.animation = 'none'; pw.offsetHeight; pw.style.animation = ''
+  document.getElementById('patient-emoji').textContent = p.emoji
+  document.getElementById('patient-name').textContent = p.name
+
+  const bubble = document.getElementById('bubble')
+  bubble.style.animation = 'none'; bubble.offsetHeight; bubble.style.animation = ''
+  bubble.textContent = q.q
+
+  const flipped = Math.random() > 0.5
+  const lBtn = document.getElementById('choice-left')
+  const rBtn = document.getElementById('choice-right')
+  lBtn.className = 'choice-btn from-left'; rBtn.className = 'choice-btn from-right'
+  lBtn.disabled = false; rBtn.disabled = false
+  lBtn.textContent = q.choices[flipped ? 1 : 0]; rBtn.textContent = q.choices[flipped ? 0 : 1]
+  lBtn.dataset.idx = flipped ? 1 : 0; rBtn.dataset.idx = flipped ? 0 : 1
+  document.getElementById('feedback-msg').textContent = ''
+}
+
+function updateAngerBar() {
+  const bar = document.getElementById('anger-bar')
+  bar.style.width = angerPct + '%'
+  bar.style.background = angerPct > 70 ? '#be123c' : angerPct > 40 ? '#f97316' : '#e63946'
+}
+
+function answer(btnEl) {
+  if (answered) return
+  answered = true
+  const q = questions[qIdx]
+  const chosen = parseInt(btnEl.dataset.idx)
+  const isCorrect = chosen === q.correct
+  const lBtn = document.getElementById('choice-left')
+  const rBtn = document.getElementById('choice-right')
+  lBtn.disabled = true; rBtn.disabled = true
+  ;[lBtn, rBtn].forEach(b => {
+    if (parseInt(b.dataset.idx) === q.correct) b.classList.add('correct')
+    else b.classList.add('wrong')
+  })
+  const fb = document.getElementById('feedback-msg')
+  if (isCorrect) {
+    score += 100
+    document.getElementById('hud-score').textContent = `SCORE ${score}`
+    fb.style.color = '#06C755'; fb.textContent = '✅ ' + q.feedback_ok
+  } else {
+    angerPct = Math.min(100, angerPct + q.anger_wrong)
+    updateAngerBar()
+    document.getElementById('stage').classList.add('shake')
+    setTimeout(() => document.getElementById('stage').classList.remove('shake'), 350)
+    fb.style.color = '#e63946'; fb.textContent = '❌ ' + q.feedback_ng
+  }
+  if (angerPct >= 100) { setTimeout(() => gameOver(), 1100); return; }
+  setTimeout(() => nextQuestion(), 1600)
+}
+
+function nextQuestion() {
+  qIdx++
+  if (qIdx >= questions.length) { showClear(); return; }
+  renderQuestion()
+}
+
+function showClear() {
+  showScreen('screen-clear')
+  document.getElementById('clear-score').textContent = `スコア: ${score} / 怒りゲージ: ${Math.round(angerPct)}%`
+  document.getElementById('clear-msg').textContent = CLEAR_MSGS[Math.floor(Math.random() * CLEAR_MSGS.length)]
+}
+
+function gameOver() {
+  const p = PATIENTS[questions[qIdx < questions.length ? qIdx : qIdx-1].patientIdx]
+  showScreen('screen-gameover')
+  document.getElementById('go-patient').textContent = p.emoji + ' ' + p.name + ' に撃沈'
+  document.getElementById('go-msg').textContent = GO_MSGS[Math.floor(Math.random() * GO_MSGS.length)]
+  document.getElementById('go-score').textContent = `Q${qIdx+1}で力尽きた / スコア: ${score}`
+}
+
+function shareResult() {
+  const text = `モンスターペイシェント全問乗り切った！スコア:${score} #圧ゲー #モンスターペイシェント ${location.href}`
+  if (navigator.share) navigator.share({ title:'圧ゲー', text, url:location.href })
+  else { navigator.clipboard.writeText(text); alert('コピーしました') }
+}
+function shareGameOver() {
+  const p = PATIENTS[questions[qIdx < questions.length ? qIdx : qIdx-1].patientIdx]
+  const text = `${p.emoji}${p.name}に撃沈…Q${qIdx+1}で力尽きた。スコア:${score} #圧ゲー #モンスターペイシェント ${location.href}`
+  if (navigator.share) navigator.share({ title:'圧ゲー', text, url:location.href })
+  else { navigator.clipboard.writeText(text); alert('コピーしました') }
+}
+
+function startGame() { initState(); showScreen('screen-game'); renderQuestion(); }
+function restartGame() { initState(); showScreen('screen-game'); renderQuestion(); }
+
+document.getElementById('choice-left').onclick = function() { answer(this) }
+document.getElementById('choice-right').onclick = function() { answer(this) }
+</script>
+</body>
+</html>
