@@ -85,9 +85,9 @@
     </div>
     <canvas id="canvas" width="320" height="420"></canvas>
     <div class="touch-controls" id="touch-controls">
-      <button class="touch-btn" id="btn-left" ontouchstart="touchStart('left')" ontouchend="touchEnd('left')" onmousedown="touchStart('left')" onmouseup="touchEnd('left')">◀</button>
-      <button class="touch-btn touch-btn-invincible" id="btn-inv" ontouchstart="touchInvincible()" onmousedown="touchInvincible()">無敵</button>
-      <button class="touch-btn" id="btn-right" ontouchstart="touchStart('right')" ontouchend="touchEnd('right')" onmousedown="touchStart('right')" onmouseup="touchEnd('right')">▶</button>
+      <button class="touch-btn" id="btn-left">◀</button>
+      <button class="touch-btn touch-btn-invincible" id="btn-inv">無敵</button>
+      <button class="touch-btn" id="btn-right">▶</button>
     </div>
     <div id="ui-overlay">
       <div id="screen-start" style="display:flex;flex-direction:column;align-items:center;gap:12px">
@@ -395,23 +395,43 @@ window.addEventListener('resize', resizeCanvas)
 resizeCanvas()
 
 // ── touch controls ─────────────────────────────────────────
-const touchState = { left: false, right: false }
-function touchStart(dir) {
-  touchState[dir] = true
-  if (dir === 'left') state.keys['ArrowLeft'] = true
-  else state.keys['ArrowRight'] = true
-}
-function touchEnd(dir) {
-  touchState[dir] = false
-  if (dir === 'left') state.keys['ArrowLeft'] = false
-  else state.keys['ArrowRight'] = false
-}
 function touchInvincible() {
   if (state.phase === 'playing') {
     state.invincible = true
     state.invincibleUntil = performance.now() + 800
   }
 }
+
+// pointer events (works for both touch and mouse)
+;(function() {
+  function setupBtn(id, key) {
+    const btn = document.getElementById(id)
+    if (!btn) return
+    btn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      btn.setPointerCapture(e.pointerId)
+      state.keys[key] = true
+    })
+    btn.addEventListener('pointerup', e => {
+      e.preventDefault()
+      state.keys[key] = false
+    })
+    btn.addEventListener('pointercancel', e => {
+      state.keys[key] = false
+    })
+  }
+  setupBtn('btn-left', 'ArrowLeft')
+  setupBtn('btn-right', 'ArrowRight')
+
+  const invBtn = document.getElementById('btn-inv')
+  if (invBtn) {
+    invBtn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      touchInvincible()
+    })
+  }
+})()
+
 // show hint based on input type
 if (window.matchMedia('(pointer: coarse)').matches) {
   const hint = document.getElementById('ctrl-hint')
