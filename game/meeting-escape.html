@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>会議室からの脱出 | 圧ゲー.jp</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;background:#0d0d0d;color:#f0f0f0;min-height:100vh}
+header{background:#111;border-bottom:1px solid #333;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+header a{color:#f0f0f0;text-decoration:none}header a:hover{color:#34d399}
+.breadcrumb{font-size:12px;color:#888;padding:8px 20px;border-bottom:1px solid #222}
+.breadcrumb a{color:#aaa;text-decoration:none}
+.hero{text-align:center;padding:32px 20px 20px;border-bottom:1px solid #222}
+.hero .emoji{font-size:48px;display:block;margin-bottom:12px}
+.hero h1{font-size:clamp(20px,5vw,30px);font-weight:700;line-height:1.3;margin-bottom:10px}
+.hero .desc{color:#aaa;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto 12px}
+.tags span{display:inline-block;background:#222;border:1px solid #444;border-radius:20px;font-size:11px;padding:3px 10px;margin:2px;color:#ccc}
+.ad-banner{background:#1a1a1a;border:1px dashed #333;text-align:center;color:#555;font-size:11px;padding:10px;margin:12px 20px;border-radius:4px}
+#gw{max-width:480px;margin:20px auto;padding:0 16px}
+#gca{background:#111;border:1px solid #333;border-radius:12px;overflow:hidden;position:relative;min-height:500px;display:flex;flex-direction:column}
+#scene{flex:0 0 auto;background:#0e1a14;position:relative;overflow:hidden;border-bottom:1px solid #1a2a1a}
+.sbg{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.02) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.02) 40px)}
+#scene-img{width:100%;min-height:130px;display:flex;align-items:center;justify-content:center;font-size:56px;padding:14px;position:relative;z-index:1}
+#scene-desc{background:rgba(0,0,0,.75);padding:9px 13px;font-size:12px;line-height:1.6;color:#ccc;position:relative;z-index:2}
+#mtimer{position:absolute;top:9px;right:10px;background:rgba(0,0,0,.72);border:1px solid #333;border-radius:6px;padding:3px 9px;font-size:10px;color:#aaa;z-index:5;text-align:right}
+#mtimer strong{color:#ef4444;font-size:13px;font-family:monospace}
+#log{height:130px;overflow-y:auto;padding:9px 13px;background:#080d08;font-size:12px;line-height:1.75;border-bottom:1px solid #1a2a1a}
+.ll{margin-bottom:1px;color:#bbb}
+.ll.sys{color:#34d399}.ll.boss{color:#ef4444}.ll.pl{color:#60a5fa}.ll.hint{color:#fbbf24;font-weight:700}.ll.wng{color:#f87171;font-style:italic}
+#choices{padding:10px 13px;display:flex;flex-direction:column;gap:7px;min-height:120px}
+.cb{background:#0e1a0e;border:1px solid #2a4a2a;border-radius:7px;color:#ccc;font-size:12px;padding:9px 13px;text-align:left;cursor:pointer;font-family:inherit;transition:background .12s,border-color .12s;line-height:1.5}
+.cb:hover{background:#142014;border-color:#34d399;color:#f0f0f0}
+.cb.dis{opacity:.35;pointer-events:none}
+.cb.wong{border-color:#ef4444 !important;color:#f87171 !important}
+#parea{padding:9px 13px;background:#0a0a0a;border-top:1px solid #181818;display:flex;align-items:center;gap:9px;font-size:11px;color:#555}
+#pbb{flex:1;height:5px;background:#181818;border-radius:3px;overflow:hidden}
+#pb{height:100%;background:#34d399;border-radius:3px;transition:width .4s}
+#overlay{position:absolute;inset:0;background:rgba(0,0,0,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;border-radius:12px;text-align:center;padding:26px}
+#overlay h2{font-size:21px;margin-bottom:8px}
+#overlay p{color:#aaa;font-size:12px;margin-bottom:14px;line-height:1.8}
+.btn{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:9px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin:3px;transition:background .15s,transform .1s}
+.btn:hover{background:#15803d;transform:scale(1.03)}
+.btn-sub{background:#333;color:#ccc}.btn-sub:hover{background:#444}
+#rs{font-size:32px;font-weight:700;color:#34d399;margin:6px 0}
+#pf{position:absolute;inset:0;background:rgba(239,68,68,.15);pointer-events:none;opacity:0;z-index:10;border-radius:12px;transition:opacity .2s}
+.how-to{max-width:480px;margin:14px auto;padding:0 16px 36px}
+.how-to h2{font-size:15px;margin-bottom:7px;color:#ccc;border-bottom:1px solid #333;padding-bottom:5px}
+.how-to li{font-size:13px;color:#888;padding:4px 0 4px 15px;position:relative;list-style:none}
+.how-to li::before{content:'·';position:absolute;left:0;color:#34d399}
+footer{text-align:center;font-size:12px;color:#555;padding:18px;border-top:1px solid #222}
+footer a{color:#666;text-decoration:none}
+</style>
+</head>
+<body>
+<header><a href="../index.html">圧ゲー.jp</a><a href="../index.html">← ゲーム一覧</a></header>
+<div class="breadcrumb"><a href="../index.html">トップ</a> / 会議室からの脱出</div>
+<div class="hero">
+  <span class="emoji">🚪</span>
+  <h1>会議室からの脱出</h1>
+  <p class="desc">正解しても会議は終わらない。<br>不正解なら会議が延びる。<br>「以上です」が言えるまで、ここから出られない。</p>
+  <div class="tags"><span>脱出系</span><span>会社・オフィス</span><span>全6問</span><span>無料</span></div>
+</div>
+<div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+<div id="gw">
+  <div id="gca">
+    <div id="pf"></div>
+    <div id="scene">
+      <div class="sbg"></div>
+      <div id="scene-img">🪑</div>
+      <div id="scene-desc">会議室に入った。扉が閉まった。</div>
+      <div id="mtimer">会議時間<br><strong id="tv">00:00</strong></div>
+    </div>
+    <div id="log"><div class="ll sys">── 会議が始まった ──</div></div>
+    <div id="choices"></div>
+    <div id="parea">
+      <span id="sl">0/6</span>
+      <div id="pbb"><div id="pb" style="width:0%"></div></div>
+      <span id="sd" style="color:#34d399">0pt</span>
+    </div>
+    <div id="overlay">
+      <h2>🚪 会議室からの脱出</h2>
+      <p>理不尽な問いが降り注ぐ。<br>正解を選べ。ただし<strong>正解してもペナルティが来る場合がある。</strong><br>間違えるたびに会議が延びる。<br>全6問、最後に「以上です」と言え。</p>
+      <button class="btn" id="start-btn">▶ スタート</button>
+    </div>
+  </div>
+</div>
+<div class="how-to">
+  <h2>HOW TO PLAY</h2>
+  <ul>
+    <li>4択を選んで会議の理不尽に対処する</li>
+    <li>正解で次のステージへ進める（正解しても追加展開が来ることがある）</li>
+    <li>不正解だと会議時間が延長。何度でも選び直せる</li>
+    <li>会議時間が短いほど最終スコアが高い</li>
+  </ul>
+</div>
+<footer>© 2025 圧ゲー.jp &nbsp;|&nbsp; <a href="../privacy.html">プライバシーポリシー</a> &nbsp;|&nbsp; <a href="../contact.html">お問い合わせ</a></footer>
+<script>
+const STAGES=[
+  {
+    id:1,scene:'😶',title:'「なんかいい感じに」会議',
+    desc:'田中部長（59）が白紙の資料を渡してきた。「これ、なんかいい感じにしといて」',
+    log:[
+      {w:'boss',t:'「これ、なんかいい感じにしといて」'},
+      {w:'sys',t:'── 資料は白紙だった ──'},
+      {w:'boss',t:'「わかるよね？　いい感じに」'},
+    ],
+    q:'「いい感じ」への正しい対処は？',
+    choices:[
+      {t:'「具体的にどういった方向性でしょうか」と聞く',ok:true,pt:80,
+       fb:'「まあそういうことだよ」と言われた。情報は得られなかったが、聞いた実績は残った。',
+       after:[{w:'boss',t:'「あ、あとやっぱり別の人に頼むわ」'}], afterPenalty:120},
+      {t:'なんかいい感じにする',ok:false,pen:480,
+       fb:'3時間後「違う、これじゃない」と言われた。何が違うかは教えてくれない。'},
+      {t:'「いい感じの定義を教えてください」と返す',ok:false,pen:600,
+       fb:'「なんでそんな細かいの？」と言われた。正当な質問なのに。'},
+      {t:'「わかりました」と言って何もしない',ok:false,pen:300,
+       fb:'「どうなった？」と追いかけてきた。「取り掛かっています」と答えた。嘘だった。'},
+    ]
+  },
+  {
+    id:2,scene:'⏱️',title:'「急ぎ」解読クイズ',
+    desc:'「これ急ぎでよろしく」とメッセージが来た。「急ぎ」の定義が分からない。',
+    log:[
+      {w:'boss',t:'「これ急ぎでよろしく」'},
+      {w:'pl',t:'「いつまでにでしょうか？」'},
+      {w:'boss',t:'「急ぎです」'},
+      {w:'pl',t:'「今日中ということでしょうか」'},
+      {w:'boss',t:'「急ぎって言ってるじゃないですか」'},
+    ],
+    q:'「急ぎ」はいつまでか。正解は何か？',
+    choices:[
+      {t:'30分以内と解釈して全力で仕上げて送る',ok:false,pen:360,
+       fb:'「なんでこんなに早いの？ちゃんと考えた？」と言われた。'},
+      {t:'今週末と解釈してゆっくり作る',ok:false,pen:720,
+       fb:'「え、なんで今週末なの！」と怒鳴られた。急ぎだったらしい。'},
+      {t:'「今日17時でよろしいでしょうか」と確認を取る',ok:true,pt:100,
+       fb:'「そう、それくらい」と言った。なぜ最初から言わない。'},
+      {t:'「急ぎを定量的に定義してください」と言う',ok:false,pen:9999,
+       fb:'一瞬沈黙があり「ちょっとうちの子いじめないでくれる？」と聞こえない声で言われた。会議が無限に延びた。'},
+    ]
+  },
+  {
+    id:3,scene:'🔁',title:'「前回の結論」追認会議',
+    desc:'「先週の会議で決まったことがあるじゃないですか」\n問題：先週の会議では何も決まっていなかった。',
+    log:[
+      {w:'boss',t:'「先週の会議で決まったことあるじゃないですか」'},
+      {w:'pl',t:'「議事録では「継続審議」でした」'},
+      {w:'boss',t:'「でも口頭で決まったよね」'},
+      {w:'sys',t:'── 誰も覚えていない ──'},
+    ],
+    q:'「口頭で決まったこと」への対処は？',
+    choices:[
+      {t:'「今この場で改めて決定しましょう」と提案する',ok:true,pt:90,
+       fb:'その場で決まった。内容は先週と全く同じだった。なんだったんだ。',
+       after:[{w:'boss',t:'「あ、でもこれって誰が実行するの」'}], afterPenalty:240},
+      {t:'「私は聞いていませんでした」と言う',ok:false,pen:540,
+       fb:'「いや、言ったよ？」の大合唱が始まった。'},
+      {t:'「決まったことにして進めましょう」と言う',ok:false,pen:300,
+       fb:'「内容は？」という新しい問いが生まれた。'},
+      {t:'「記憶は主観的なものです」と言い始める',ok:false,pen:780,
+       fb:'「哲学の授業じゃないんだよ」と言われた。正しいことを言っているのに。'},
+    ]
+  },
+  {
+    id:4,scene:'📎',title:'添付なしメール確認会議',
+    desc:'全員宛てメールが来た。本文「ご確認ください」。添付：なし。\nこのメールを確認するために会議が設定された。',
+    log:[
+      {w:'boss',t:'「件のメール、確認しましたか」'},
+      {w:'pl',t:'「添付がなかったのですが…」'},
+      {w:'boss',t:'「え、送ったと思うんだけどな」'},
+      {w:'sys',t:'── この確認のために会議が招集された（2回目） ──'},
+    ],
+    q:'この状況を終わらせるには？',
+    choices:[
+      {t:'「再送をお願いします」とメールで返す',ok:true,pt:70,
+       fb:'「あ、ごめんごめん」と言って再送された。内容は全員知っていた情報だった。',
+       after:[{w:'boss',t:'「あ、あとこれも読んでおいて」と新しいメールが届いた'}], afterPenalty:180},
+      {t:'「実は受け取っていました」と嘘をつく',ok:false,pen:480,
+       fb:'「じゃあ内容言ってみて」と言われた。言えなかった。'},
+      {t:'「添付なしのメールには返信しない主義です」と言う',ok:false,pen:900,
+       fb:'「主義とは」という1時間の議論が始まった。'},
+      {t:'黙って頷き続ける',ok:false,pen:360,
+       fb:'「つまりどういうこと？」と聞かれ、さらに続いた。'},
+    ]
+  },
+  {
+    id:5,scene:'🤷',title:'「誰がやるの」会議',
+    desc:'プロジェクトの担当者が決まっていない。\n「誰がやるの」という問いが宙に浮いている。\n全員が沈黙している。13分が経過した。',
+    log:[
+      {w:'boss',t:'「で、これ誰がやるの」'},
+      {w:'sys',t:'── 沈黙（3分） ──'},
+      {w:'boss',t:'「誰でもいいんだけど」'},
+      {w:'sys',t:'── 沈黙（さらに10分） ──'},
+      {w:'boss',t:'「じゃあ…誰かやってよ」'},
+    ],
+    q:'この沈黙を終わらせるには？',
+    choices:[
+      {t:'「私がやります」と言う',ok:false,pen:0,
+       fb:'「ありがとう！　じゃあこっちも頼んでいい？」と3件追加された。ゼロペナルティだが仕事が増えた。'},
+      {t:'「業務量を確認してから返答させてください」と言う',ok:true,pt:120,
+       fb:'「…わかった」と言われた。少し空気が重くなったが、次の会議で正式に決まった。'},
+      {t:'さりげなく下を向く',ok:false,pen:240,
+       fb:'「ねえ、聞いてる？」と名指しされた。'},
+      {t:'「できる人がやるのがいいと思います」と言う',ok:false,pen:600,
+       fb:'「じゃあできる人って誰？」という新しい会議が始まった。'},
+    ]
+  },
+  {
+    id:6,scene:'🚪',title:'「以上です」が言えない会議',
+    desc:'「以上です」と言った。拍手が起きた。\n田中部長が口を開いた。「あ、そうだ」\n5回目だ。',
+    log:[
+      {w:'pl',t:'「以上です」（4回目）'},
+      {w:'boss',t:'「お疲れ様でした」'},
+      {w:'sys',t:'── 全員が立ち上がった ──'},
+      {w:'boss',t:'「あ、そうだ。ひとつだけ」'},
+      {w:'sys',t:'── 全員が座った ──'},
+      {w:'boss',t:'「……なんだっけ」'},
+      {w:'sys',t:'── 誰も助けない ──'},
+    ],
+    q:'この「なんだっけ」を終わらせるには？',
+    choices:[
+      {t:'立ちながら「次回確認させてください」と言って退室する',ok:true,pt:200,
+       fb:'脱出成功。「あ、そうそう」という声が背後で聞こえた。もう聞こえなかった。'},
+      {t:'「思い出したらご連絡ください」と言って席で待つ',ok:false,pen:720,
+       fb:'18分後に「あ、思い出した」と言われた。「特にないかな」だった。'},
+      {t:'「思い出さなくていいです」と言う',ok:false,pen:1800,
+       fb:'傷ついた顔をされ、翌日1on1が設定された。その1on1でも「なんだっけ」と言われた。'},
+      {t:'そのまま席で瞑想を始める',ok:false,pen:300,
+       fb:'「大丈夫ですか？」と心配された。会議が続いた。'},
+    ]
+  }
+];
+
+let cur=0,totalPen=0,score=0,wrong=0,tsec=0,tiv=null;
+
+const simg=document.getElementById('scene-img');
+const sdesc=document.getElementById('scene-desc');
+const logEl=document.getElementById('log');
+const choicesEl=document.getElementById('choices');
+const tv=document.getElementById('tv');
+const pb=document.getElementById('pb');
+const sl=document.getElementById('sl');
+const sd=document.getElementById('sd');
+const overlay=document.getElementById('overlay');
+const pf=document.getElementById('pf');
+
+function p2(n){return String(n).padStart(2,'0')}
+function ft(s){return `${p2(Math.floor(s/60))}:${p2(s%60)}`}
+
+function al(w,t){
+  const d=document.createElement('div');
+  d.className='ll '+(w==='boss'?'boss':w==='pl'?'pl':w==='hint'?'hint':w==='wng'?'wng':'sys');
+  const pre=w==='boss'?'👔 ':w==='pl'?'🧑 ':w==='hint'?'▶ ':w==='wng'?'❌ ':'';
+  d.textContent=pre+t; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight;
+}
+
+function startTimer(){
+  clearInterval(tiv); tsec=totalPen; tv.textContent=ft(tsec);
+  tiv=setInterval(()=>{tsec++;tv.textContent=ft(tsec);},1000);
+}
+
+function startGame(){
+  cur=0;totalPen=0;score=0;wrong=0;
+  logEl.innerHTML='<div class="ll sys">── 会議が始まった ──</div>';
+  overlay.style.display='none'; startTimer(); loadStage(0);
+}
+
+function loadStage(idx){
+  if(idx>=STAGES.length){showFinal();return;}
+  const s=STAGES[idx];
+  simg.textContent=s.scene; sdesc.textContent=s.desc;
+  sl.textContent=`${idx}/${STAGES.length}`; pb.style.width=(idx/STAGES.length*100)+'%';
+  choicesEl.innerHTML='<p style="color:#444;font-size:11px;text-align:center;padding:10px">…</p>';
+  setTimeout(()=>{
+    al('sys',`── ステージ${idx+1}：${s.title} ──`);
+    let delay=280;
+    s.log.forEach(l=>{setTimeout(()=>al(l.w,l.t),delay);delay+=480;});
+    setTimeout(()=>{al('hint',s.q);showChoices(s);},delay+280);
+  },150);
+}
+
+function showChoices(s){
+  choicesEl.innerHTML='';
+  s.choices.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='cb'; btn.textContent=c.t;
+    btn.addEventListener('click',()=>onChoice(s,c,btn));
+    choicesEl.appendChild(btn);
+  });
+}
+
+function flashRed(){pf.style.opacity='1';setTimeout(()=>pf.style.opacity='0',350);}
+
+function onChoice(s,c,btn){
+  choicesEl.querySelectorAll('.cb').forEach(b=>b.classList.add('dis'));
+  al('pl','「'+c.t+'」');
+  if(c.ok){
+    score+=c.pt; sd.textContent=score+'pt';
+    btn.style.borderColor='#34d399'; btn.style.color='#34d399';
+    al('sys','✅ '+c.fb);
+    // 正解後追加展開（罠）
+    if(c.after&&c.after.length>0){
+      let d=600;
+      c.after.forEach(a=>{setTimeout(()=>al(a.w,a.t),d);d+=400;});
+      if(c.afterPenalty>0){
+        setTimeout(()=>{
+          const pm=Math.round(c.afterPenalty/60),ps=c.afterPenalty%60;
+          const ps2=pm>0?`${pm}分${ps>0?ps+'秒':''}`:ps+'秒';
+          totalPen+=c.afterPenalty; tsec+=c.afterPenalty; flashRed();
+          al('sys',`⏱ さらに ${ps2} 延長された`);
+        },d);
+        setTimeout(()=>{cur++;loadStage(cur);},d+1800);
+      } else {
+        setTimeout(()=>{cur++;loadStage(cur);},d+1600);
+      }
+    } else {
+      setTimeout(()=>{cur++;loadStage(cur);},1800);
+    }
+  } else {
+    wrong++;
+    const pen=c.pen||0;
+    if(pen>0){
+      totalPen+=pen; tsec+=pen; flashRed();
+      const pm=Math.round(pen/60),ps=pen%60;
+      const ps2=pm>0?`${pm}分${ps>0?ps+'秒':''}`:ps+'秒';
+      btn.classList.add('wong');
+      al('wng',c.fb);
+      al('sys',`⏱ 会議が ${ps2} 延長された`);
+    } else {
+      btn.classList.add('wong');
+      al('wng',c.fb);
+    }
+    setTimeout(()=>showChoices(s),2000);
+  }
+}
+
+function showFinal(){
+  clearInterval(tiv);
+  const fin=tsec, tb=Math.max(0,2400-fin), total=score+tb;
+  const rank=total>=1200?'S':total>=800?'A':total>=500?'B':'C';
+  const cm={S:'完璧。この会議の達人。',A:'なんとか脱出できた。',B:'消耗した。',C:'……お疲れ様でした。'};
+  pb.style.width='100%'; sl.textContent=`${STAGES.length}/${STAGES.length}`;
+  al('pl','「……以上です」'); al('sys','🚪 扉が開いた。');
+  setTimeout(()=>{
+    overlay.style.display='flex';
+    overlay.innerHTML=`<h2>🚪 脱出成功</h2><p>会議時間: <strong style="color:#ef4444">${ft(fin)}</strong><br>ミス: ${wrong}回 / タイムボーナス: +${tb}pt</p><div id="rs">${total} pt</div><p style="color:#ccc;font-size:18px;font-weight:700">ランク ${rank}</p><p style="color:#aaa;font-size:11px">${cm[rank]}</p><button class="btn" onclick="startGame()">もう一度</button><button class="btn btn-sub" onclick="tw(${total},'${rank}')">SNS共有</button>`;
+  },1600);
+}
+
+function tw(s,r){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(`会議室からの脱出: ${s}pt ランク${r} #圧ゲー #会議室からの脱出`));}
+document.getElementById('start-btn').addEventListener('click',startGame);
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アンコンシャスバイアス弾幕 | 圧ゲー.jp</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;background:#0d0d0d;color:#f0f0f0;min-height:100vh}
+header{background:#111;border-bottom:1px solid #333;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+header a{color:#f0f0f0;text-decoration:none}header a:hover{color:#a78bfa}
+.breadcrumb{font-size:12px;color:#888;padding:8px 20px;border-bottom:1px solid #222}
+.breadcrumb a{color:#aaa;text-decoration:none}
+.hero{text-align:center;padding:32px 20px 20px;border-bottom:1px solid #222}
+.hero .emoji{font-size:48px;display:block;margin-bottom:12px}
+.hero h1{font-size:clamp(19px,5vw,27px);font-weight:700;line-height:1.3;margin-bottom:10px}
+.hero .desc{color:#aaa;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto 12px}
+.tags span{display:inline-block;background:#222;border:1px solid #444;border-radius:20px;font-size:11px;padding:3px 10px;margin:2px;color:#ccc}
+.ad-banner{background:#1a1a1a;border:1px dashed #333;text-align:center;color:#555;font-size:11px;padding:10px;margin:12px 20px;border-radius:4px}
+#game-wrap{max-width:480px;margin:20px auto;padding:0 16px}
+#status-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px;color:#aaa}
+#status-bar span{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:4px 12px}
+#game-canvas-area{background:#0a0a14;border:1px solid #333;border-radius:12px;overflow:hidden;position:relative;height:420px}
+#bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 110%,#1a0a2e 0%,#0a0a14 60%)}
+.bg-desk{position:absolute;bottom:58px;left:8%;right:8%;height:7px;background:#1c1c2c;border-top:1px solid #2a2a3a;border-radius:2px}
+#player{position:absolute;bottom:66px;font-size:34px;z-index:10;user-select:none;transition:left .04s}
+/* 盾 */
+#shield-el{position:absolute;bottom:60px;font-size:34px;z-index:9;opacity:0;pointer-events:none;transition:opacity .15s}
+#shield-el.on{opacity:1}
+/* HP/盾バー */
+#bars{position:absolute;top:10px;left:10px;right:10px;z-index:20;display:flex;flex-direction:column;gap:5px}
+.barrow{display:flex;align-items:center;gap:7px}
+.barlabel{font-size:10px;color:#aaa;width:32px;flex-shrink:0}
+.barbg{flex:1;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;border:1px solid #2a2a2a}
+.barfill{height:100%;border-radius:4px;transition:width .12s}
+#hp-fill{background:#a78bfa}
+#sh-fill{background:#34d399}
+#timer-c{position:absolute;top:10px;right:10px;font-size:18px;font-weight:700;font-family:monospace;color:#eee;z-index:20}
+/* 「止まるな」警告 */
+#still-warn{position:absolute;top:46px;left:50%;transform:translateX(-50%);background:rgba(255,60,60,.85);color:#fff;font-size:11px;padding:3px 10px;border-radius:6px;z-index:25;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
+/* 被弾ワード */
+#hit-word{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:700;color:#fff;background:rgba(140,0,200,.88);padding:8px 14px;border-radius:10px;z-index:30;opacity:0;pointer-events:none;text-align:center;max-width:230px;white-space:pre-wrap;border:1px solid #c060ff}
+/* 盾ゲージ切れ警告 */
+#shield-empty{position:absolute;bottom:108px;left:50%;transform:translateX(-50%);background:rgba(80,200,80,.85);color:#fff;font-size:10px;padding:2px 8px;border-radius:5px;z-index:25;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none}
+/* 弾 */
+.bullet{position:absolute;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;z-index:8;pointer-events:none}
+.g{background:#3d0e57;color:#e4b4f0;border:1px solid #7a2f9e}
+.a{background:#102840;color:#a0c8f0;border:1px solid #2e6fa8}
+.w{background:#4a1a0a;color:#f0b090;border:1px solid #a84a2e}
+.b{background:#0e3a1a;color:#90f0a8;border:1px solid #2ea84a}
+.o{background:#3a3a0a;color:#f0e090;border:1px solid #a8902e}
+.m{background:#2a0a2a;color:#f0b0f0;border:1px solid #8a2e8a}
+/* 狙い弾（赤枠） */
+.aimed{border-width:2px !important;border-color:#ff4d4d !important;box-shadow:0 0 6px rgba(255,77,77,.5)}
+#overlay{position:absolute;inset:0;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;border-radius:12px;text-align:center;padding:22px}
+#overlay h2{font-size:22px;margin-bottom:8px}
+#overlay p{color:#aaa;font-size:13px;margin-bottom:14px;line-height:1.7}
+.btn{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:9px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin:3px;transition:background .15s,transform .1s}
+.btn:hover{background:#6d28d9;transform:scale(1.03)}
+.btn-sub{background:#333;color:#ccc}.btn-sub:hover{background:#444}
+#res-score{font-size:32px;font-weight:700;color:#a78bfa;margin:6px 0}
+#mobile-controls{display:flex;justify-content:center;gap:10px;margin-top:10px}
+#mobile-controls button{background:#1a1a1a;border:1px solid #444;border-radius:10px;color:#f0f0f0;font-size:19px;padding:9px 18px;cursor:pointer;user-select:none;-webkit-user-select:none}
+#mobile-controls button:active{background:#333}
+#btn-sh{background:#0e0e20;border-color:#7c3aed;color:#a78bfa;font-size:13px}
+.how-to{max-width:480px;margin:14px auto;padding:0 16px 36px}
+.how-to h2{font-size:15px;margin-bottom:7px;color:#ccc;border-bottom:1px solid #333;padding-bottom:5px}
+.how-to li{font-size:13px;color:#888;padding:4px 0 4px 15px;position:relative;list-style:none}
+.how-to li::before{content:'·';position:absolute;left:0;color:#a78bfa}
+footer{text-align:center;font-size:12px;color:#555;padding:18px;border-top:1px solid #222}
+footer a{color:#666;text-decoration:none}
+@keyframes hf{0%,100%{opacity:1}50%{opacity:.15}}
+.hitanim{animation:hf .22s ease}
+@keyframes bighit{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}15%{transform:translate(-50%,-50%) scale(1.05);opacity:1}75%{opacity:1}100%{opacity:0}}
+.bha{animation:bighit 1.3s ease forwards}
+#scorecanv{position:absolute;bottom:8px;right:10px;font-size:12px;color:#666;z-index:20}
+</style>
+</head>
+<body>
+<header><a href="../index.html">圧ゲー.jp</a><a href="../index.html">← ゲーム一覧</a></header>
+<div class="breadcrumb"><a href="../index.html">トップ</a> / アンコンシャスバイアス弾幕</div>
+<div class="hero">
+  <span class="emoji">💬</span>
+  <h1>アンコンシャスバイアス弾幕</h1>
+  <p class="desc">「悪気はないんだけど」——その一言が一番キツい。<br>止まると狙い撃ちされる。盾は万能じゃない。<br>当たっても誰も謝らない。</p>
+  <div class="tags"><span>回避系2分</span><span>LGBTQ・多様性</span><span>無料</span></div>
+</div>
+<div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+<div id="game-wrap">
+  <div id="status-bar">
+    <span>残り <strong id="tlabel">120</strong>秒</span>
+    <span>HP <strong id="hplabel">100</strong></span>
+    <span>スコア <strong id="slabel">0</strong></span>
+  </div>
+  <div id="game-canvas-area">
+    <div id="bg"></div><div class="bg-desk"></div>
+    <div id="bars">
+      <div class="barrow"><span class="barlabel">HP</span><div class="barbg"><div class="barfill" id="hp-fill" style="width:100%"></div></div></div>
+      <div class="barrow"><span class="barlabel">盾</span><div class="barbg"><div class="barfill" id="sh-fill" style="width:100%"></div></div></div>
+    </div>
+    <div id="timer-c">120</div>
+    <div id="still-warn">止まってる！狙われてる！</div>
+    <div id="player">🧑</div>
+    <div id="shield-el">🫸</div>
+    <div id="hit-word"></div>
+    <div id="shield-empty">盾切れ！</div>
+    <div id="scorecanv">0 pt</div>
+    <div id="overlay">
+      <h2>💬 アンコンシャスバイアス弾幕</h2>
+      <p>「悪気のない一言」が降り注ぐ2分間。<br>
+      ・<strong>止まると直下に狙い弾</strong>が集中する<br>
+      ・盾（Shift）は3秒に1発しか弾かない<br>
+      ・盾ゲージが空だと回復が遅い<br>
+      ・HPはゼロになったら終わり。回復なし。</p>
+      <button class="btn" id="start-btn">▶ スタート</button>
+    </div>
+  </div>
+  <div id="mobile-controls">
+    <button id="btn-left">◀</button>
+    <button id="btn-sh">🫸 盾</button>
+    <button id="btn-right">▶</button>
+  </div>
+</div>
+<div class="how-to">
+  <h2>HOW TO PLAY</h2>
+  <ul>
+    <li>← → キーまたは画面下ボタンで左右移動</li>
+    <li><strong>止まっていると直下を狙う弾が増える</strong>——常に動き続けろ</li>
+    <li>Shift or 盾ボタンで防御。ただし3秒に1発しか弾かない</li>
+    <li>盾ゲージが空になると回復が遅い——使いすぎ注意</li>
+    <li>時間が経つほど弾が速く、多くなる</li>
+    <li>2分間HPが残っていればクリア。回復なし</li>
+  </ul>
+</div>
+<footer>© 2025 圧ゲー.jp &nbsp;|&nbsp; <a href="../privacy.html">プライバシーポリシー</a> &nbsp;|&nbsp; <a href="../contact.html">お問い合わせ</a></footer>
+<script>
+const BD=[
+  {t:'女の子っぽくないね',c:'g'},{t:'男なのにそれ好きなの？',c:'g'},{t:'女性なのに論理的だね',c:'g'},
+  {t:'男のくせに泣くの？',c:'g'},{t:'女らしくしたら？',c:'g'},{t:'男なんだからしっかりしろ',c:'g'},
+  {t:'彼氏いるの？',c:'g'},{t:'女の子なのに運転うまいね',c:'g'},{t:'普通に見えるのに',c:'g'},
+  {t:'女性管理職を増やさないとね',c:'g'},{t:'ゲイっぽいね',c:'g'},{t:'女性だから気遣いできるね',c:'g'},
+  {t:'男性なのに家事できるんだ',c:'g'},{t:'見た目より男前だね',c:'g'},{t:'そのキャラに合わないね',c:'m'},
+  {t:'若いね',c:'a'},{t:'その年でまだ独身？',c:'a'},{t:'若いのにしっかりしてる',c:'a'},
+  {t:'もういい歳なんだから',c:'a'},{t:'お子さんいないの？',c:'a'},{t:'早く結婚しないと',c:'a'},
+  {t:'そろそろ落ち着いたら？',c:'a'},{t:'若者らしくない発言だね',c:'a'},
+  {t:'どこ出身なの？',c:'o'},{t:'日本語うまいね',c:'o'},{t:'帰国子女なんだ、頭いいね',c:'o'},
+  {t:'でも本当はどこ出身？',c:'o'},{t:'外国の方って明るいよね',c:'o'},{t:'英語話せるんでしょ',c:'o'},
+  {t:'お国ではどうなの？',c:'o'},
+  {t:'背が高いね',c:'b'},{t:'もっと食べなよ',c:'b'},{t:'体強そうだね',c:'b'},
+  {t:'細いのうらやましい',c:'b'},{t:'太ったんじゃない？',c:'b'},{t:'笑顔がないね',c:'b'},
+  {t:'見た目より仕事できるね',c:'b'},{t:'肌キレイだね',c:'b'},
+  {t:'残業できないの？',c:'w'},{t:'出世したくないの？',c:'w'},{t:'それでも社会人？',c:'w'},
+  {t:'メンタル弱いね',c:'w'},{t:'向いてないんじゃない？',c:'w'},{t:'普通はこうするよ',c:'w'},
+  {t:'昔はもっと頑張れたのに',c:'w'},
+  {t:'普通に生きたら？',c:'m'},{t:'考えすぎじゃない？',c:'m'},{t:'気にしすぎだよ',c:'m'},
+  {t:'みんなそうだよ',c:'m'},{t:'悪気はないよ',c:'m'},{t:'冗談だよ',c:'m'},
+  {t:'そういう意味じゃないって',c:'m'},{t:'傷つきやすいね',c:'m'},{t:'ガラスのハートだね',c:'m'},
+];
+
+const GAME_DUR=120, PSPEED=5, SH_DRAIN=1.5, SH_SLOW_REC=0.12, SH_FAST_REC=0.30;
+const HP_DMG=15;
+// 盾は3秒に1発しか弾けない
+const SHIELD_COOLDOWN_MS=3000;
+
+let state='idle',playerX=0.5,hp=100,shGauge=100,score=0,timeLeft=GAME_DUR;
+let bullets=[],keys={left:false,right:false,shield:false};
+let gLoop=null,sLoop=null,tLoop=null,hwTimer=null;
+let stillFrames=0,lastMoveX=0.5,prevX=0.5;
+let shieldCooldown=0; // ms残り
+
+const playerEl=document.getElementById('player');
+const shieldEl=document.getElementById('shield-el');
+const overlay=document.getElementById('overlay');
+const timerC=document.getElementById('timer-c');
+const tlabel=document.getElementById('tlabel');
+const slabel=document.getElementById('slabel');
+const scorecanv=document.getElementById('scorecanv');
+const hplabel=document.getElementById('hplabel');
+const hpFill=document.getElementById('hp-fill');
+const shFill=document.getElementById('sh-fill');
+const canvas=document.getElementById('game-canvas-area');
+const hitWord=document.getElementById('hit-word');
+const stillWarn=document.getElementById('still-warn');
+const shEmptyWarn=document.getElementById('shield-empty');
+
+function startGame(){
+  state='playing'; playerX=0.5; hp=100; shGauge=100; score=0; timeLeft=GAME_DUR;
+  bullets.forEach(b=>b.el&&b.el.remove()); bullets=[];
+  overlay.style.display='none'; hitWord.className=''; stillFrames=0; shieldCooldown=0;
+  clearInterval(gLoop);clearInterval(sLoop);clearInterval(tLoop);
+
+  tLoop=setInterval(()=>{
+    if(state!=='playing')return;
+    timeLeft--;
+    timerC.textContent=timeLeft; tlabel.textContent=timeLeft;
+    if(timeLeft<=0)showResult(true);
+  },1000);
+
+  let spawnMs=750;
+  function reSpawn(){
+    clearInterval(sLoop);
+    const elapsed=GAME_DUR-timeLeft;
+    spawnMs=Math.max(220,750-elapsed*4.5);
+    sLoop=setInterval(()=>{
+      if(state!=='playing')return;
+      spawnBullet();
+      reSpawn();
+    },spawnMs);
+  }
+  reSpawn();
+
+  gLoop=setInterval(()=>{
+    if(state!=='playing')return;
+    updatePlayer();
+    updateBullets();
+    updateShield();
+    updateUI();
+  },50);
+}
+
+function spawnBullet(){
+  const d=BD[Math.floor(Math.random()*BD.length)];
+  const el=document.createElement('div');
+  el.className='bullet '+d.c;
+  el.textContent=d.t;
+
+  let startX;
+  const elapsed=GAME_DUR-timeLeft;
+  // 「止まっていると狙い撃ち」：停止フレーム>20のとき50%の確率でプレイヤー真上に
+  if(stillFrames>20&&Math.random()<0.5){
+    startX=Math.max(0.02,Math.min(0.88,playerX-0.04+Math.random()*0.08));
+    el.classList.add('aimed');
+  } else {
+    startX=0.02+Math.random()*0.88;
+  }
+  el.style.left=(startX*100)+'%';
+  el.style.top='-28px';
+  canvas.appendChild(el);
+  const speed=2.0+Math.random()*1.5+elapsed*0.03;
+  bullets.push({el,x:startX,y:-28,speed,d,hit:false});
+}
+
+function updatePlayer(){
+  const w=canvas.offsetWidth||480;
+  const step=PSPEED/w;
+  prevX=playerX;
+  if(keys.left)playerX=Math.max(0.02,playerX-step);
+  if(keys.right)playerX=Math.min(0.92,playerX+step);
+  playerEl.style.left=(playerX*100)+'%';
+  shieldEl.style.left=((playerX+0.03)*100)+'%';
+  // 静止フレーム判定
+  if(Math.abs(playerX-prevX)<0.002)stillFrames=Math.min(200,stillFrames+1);
+  else stillFrames=0;
+  stillWarn.style.opacity=stillFrames>20?'1':'0';
+}
+
+function updateShield(){
+  const shielding=keys.shield&&shGauge>0;
+  if(shielding){
+    shGauge=Math.max(0,shGauge-SH_DRAIN);
+    shieldEl.classList.add('on');
+  } else {
+    // 空ゲージは回復遅い
+    const rec=shGauge<=0?SH_SLOW_REC:SH_FAST_REC;
+    shGauge=Math.min(100,shGauge+rec);
+    shieldEl.classList.remove('on');
+  }
+  if(shieldCooldown>0)shieldCooldown-=50;
+  shFill.style.width=shGauge+'%';
+  shEmptyWarn.style.opacity=shGauge<5?'1':'0';
+}
+
+function updateBullets(){
+  const h=canvas.offsetHeight||420;
+  const shielding=keys.shield&&shGauge>0&&shieldCooldown<=0;
+  bullets=bullets.filter(b=>{
+    if(b.hit||!b.el)return false;
+    b.y+=b.speed; b.el.style.top=b.y+'px';
+    const xClose=Math.abs(b.x-playerX)<0.13;
+    const yClose=b.y>h-120&&b.y<h-52;
+    if(xClose&&yClose){
+      if(shielding){
+        // 盾でブロック→クールダウン開始
+        shieldCooldown=SHIELD_COOLDOWN_MS;
+        score+=3;
+        b.hit=true; b.el.style.opacity='0.2';
+        setTimeout(()=>b.el&&b.el.remove(),200); return false;
+      } else {
+        hp=Math.max(0,hp-HP_DMG);
+        hpFill.style.width=hp+'%';
+        hplabel.textContent=hp;
+        hpFill.style.background=hp<30?'#ef4444':hp<60?'#f59e0b':'#a78bfa';
+        playerEl.classList.add('hitanim'); setTimeout(()=>playerEl.classList.remove('hitanim'),220);
+        showHitWord(b.d.t);
+        b.hit=true; b.el.style.opacity='0.1';
+        setTimeout(()=>b.el&&b.el.remove(),200);
+        if(hp<=0)gameover(); return false;
+      }
+    }
+    if(b.y>h+10){score+=10;b.el.remove();return false;}
+    return true;
+  });
+}
+
+function showHitWord(text){
+  clearTimeout(hwTimer);
+  hitWord.textContent=text;
+  hitWord.className='bha';
+  hwTimer=setTimeout(()=>{hitWord.className='';},1400);
+}
+
+function updateUI(){
+  slabel.textContent=score; scorecanv.textContent=score+' pt';
+}
+
+function gameover(){
+  state='gameover';
+  clearInterval(gLoop);clearInterval(sLoop);clearInterval(tLoop);
+  overlay.style.display='flex';
+  overlay.innerHTML=`<h2>💀 やられた</h2><p>「悪気はなかったんだけど」<br>（${GAME_DUR-timeLeft}秒で力尽きた）</p><div id="res-score">${score}</div><button class="btn" onclick="startGame()">もう一度</button><button class="btn btn-sub" onclick="tw()">SNS共有</button>`;
+}
+function showResult(){
+  state='result';
+  clearInterval(gLoop);clearInterval(sLoop);clearInterval(tLoop);
+  overlay.style.display='flex';
+  overlay.innerHTML=`<h2>🎉 2分間、生き残った</h2><p>言葉は降り続けた。誰も謝らなかった。</p><div id="res-score">${score}</div><button class="btn" onclick="startGame()">もう一度</button><button class="btn btn-sub" onclick="tw()">SNS共有</button>`;
+}
+function tw(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(`アンコンシャスバイアス弾幕: ${score}点 #圧ゲー #アンコンシャスバイアス`));}
+
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=true;if(e.key==='ArrowRight'||e.key==='d')keys.right=true;if(e.key==='Shift')keys.shield=true;});
+document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=false;if(e.key==='ArrowRight'||e.key==='d')keys.right=false;if(e.key==='Shift')keys.shield=false;});
+const bL=document.getElementById('btn-left'),bR=document.getElementById('btn-right'),bS=document.getElementById('btn-sh');
+['touchstart','mousedown'].forEach(ev=>{
+  bL.addEventListener(ev,e=>{e.preventDefault?.();keys.left=true},{passive:false});
+  bR.addEventListener(ev,e=>{e.preventDefault?.();keys.right=true},{passive:false});
+  bS.addEventListener(ev,e=>{e.preventDefault?.();keys.shield=true},{passive:false});
+});
+['touchend','mouseup'].forEach(ev=>{
+  bL.addEventListener(ev,e=>{e.preventDefault?.();keys.left=false},{passive:false});
+  bR.addEventListener(ev,e=>{e.preventDefault?.();keys.right=false},{passive:false});
+  bS.addEventListener(ev,e=>{e.preventDefault?.();keys.shield=false},{passive:false});
+});
+document.getElementById('start-btn').addEventListener('click',startGame);
+</script>
+</body>
+</html>

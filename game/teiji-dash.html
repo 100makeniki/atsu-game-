@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>定時ダッシュ | 圧ゲー.jp</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;background:#0d0d0d;color:#f0f0f0;min-height:100vh}
+header{background:#111;border-bottom:1px solid #333;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+header a{color:#f0f0f0;text-decoration:none}header a:hover{color:#ff4d4d}
+.breadcrumb{font-size:12px;color:#888;padding:8px 20px;border-bottom:1px solid #222}
+.breadcrumb a{color:#aaa;text-decoration:none}
+.hero{text-align:center;padding:32px 20px 20px;border-bottom:1px solid #222}
+.hero .emoji{font-size:48px;display:block;margin-bottom:12px}
+.hero h1{font-size:clamp(22px,5vw,32px);font-weight:700;line-height:1.3;margin-bottom:10px}
+.hero .desc{color:#aaa;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto 12px}
+.tags span{display:inline-block;background:#222;border:1px solid #444;border-radius:20px;font-size:11px;padding:3px 10px;margin:2px;color:#ccc}
+.ad-banner{background:#1a1a1a;border:1px dashed #333;text-align:center;color:#555;font-size:11px;padding:10px;margin:12px 20px;border-radius:4px}
+#game-wrap{max-width:480px;margin:20px auto;padding:0 16px}
+#status-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px;color:#aaa}
+#status-bar span{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:4px 12px}
+#clock-display{font-size:16px;font-weight:700;color:#ff4d4d;font-family:monospace}
+#gauge-wrap{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#gauge-label{font-size:12px;color:#aaa;white-space:nowrap;width:72px}
+#gauge-bar-bg{flex:1;height:12px;background:#222;border-radius:6px;overflow:hidden;border:1px solid #333}
+#gauge-bar{height:100%;background:#ffe066;border-radius:6px;transition:width 0.08s;width:0%}
+#game-canvas-area{background:#111;border:1px solid #333;border-radius:12px;overflow:hidden;position:relative;height:340px}
+#corridor{width:100%;height:100%;position:absolute;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 50%,#0f2040 100%);overflow:hidden}
+.wall-lamp{position:absolute;top:18px;width:6px;height:50px;background:#ffe066;border-radius:3px;box-shadow:0 0 18px 6px rgba(255,224,102,0.12)}
+.floor-stripe{position:absolute;bottom:74px;left:0;right:0;height:2px;background:rgba(255,255,255,0.06)}
+/* 上司 */
+.boss{position:absolute;bottom:78px;font-size:34px;z-index:6;user-select:none;transition:left 0.06s}
+.boss-label{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#ff4d4d;color:#fff;font-size:8px;white-space:nowrap;padding:2px 5px;border-radius:3px;font-weight:700}
+/* プレイヤー */
+#player{position:absolute;bottom:78px;font-size:34px;z-index:10;user-select:none}
+/* エレベーター */
+#elev-frame{position:absolute;right:0;top:0;bottom:0;width:58px;background:rgba(255,200,50,0.04);border-left:1px solid rgba(255,200,50,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:rgba(255,224,102,0.5);z-index:3;gap:3px}
+#elev-door{position:absolute;right:0;top:0;bottom:0;width:58px;background:#1e1e1e;border-left:2px solid #444;z-index:7;display:flex;align-items:center;justify-content:center;font-size:26px;transition:width 0.3s ease,opacity 0.3s ease}
+/* 吹き出し */
+.bubble{position:absolute;bottom:120px;background:#ff4d4d;color:#fff;font-size:10px;padding:3px 8px;border-radius:6px;white-space:nowrap;z-index:20;animation:pop .15s ease;pointer-events:none}
+.bubble::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#ff4d4d;border-bottom:none}
+@keyframes pop{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
+/* 時計 */
+#big-clock{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;font-family:monospace;color:#ffe066;text-shadow:0 0 8px rgba(255,224,102,.4);z-index:20;pointer-events:none}
+/* タイムバー */
+#timebar-wrap{position:absolute;bottom:0;left:0;right:0;height:5px;background:#222}
+#timebar{height:100%;background:#ff4d4d;width:100%;transition:width .08s linear}
+/* 「右端に居すぎ」警告 */
+#overstay-warn{position:absolute;top:38px;left:50%;transform:translateX(-50%);background:rgba(255,77,77,.85);color:#fff;font-size:11px;padding:3px 10px;border-radius:6px;z-index:25;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+/* オーバーレイ */
+#overlay{position:absolute;inset:0;background:rgba(0,0,0,.87);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;border-radius:12px;text-align:center;padding:20px}
+#overlay h2{font-size:22px;margin-bottom:8px}
+#overlay p{color:#aaa;font-size:13px;margin-bottom:18px;line-height:1.65}
+.btn{background:#ff4d4d;color:#fff;border:none;border-radius:8px;padding:9px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin:3px;transition:background .15s,transform .1s}
+.btn:hover{background:#d93333;transform:scale(1.03)}
+.btn-sub{background:#333;color:#ccc}.btn-sub:hover{background:#444}
+#res-score{font-size:32px;font-weight:700;color:#ffe066;margin:6px 0}
+#mobile-controls{display:flex;justify-content:center;gap:14px;margin-top:11px}
+#mobile-controls button{background:#1a1a1a;border:1px solid #444;border-radius:10px;color:#f0f0f0;font-size:20px;padding:10px 22px;cursor:pointer;user-select:none;-webkit-user-select:none}
+#mobile-controls button:active{background:#333}
+.how-to{max-width:480px;margin:14px auto;padding:0 16px 36px}
+.how-to h2{font-size:15px;margin-bottom:7px;color:#ccc;border-bottom:1px solid #333;padding-bottom:5px}
+.how-to li{font-size:13px;color:#888;padding:4px 0 4px 15px;position:relative;list-style:none}
+.how-to li::before{content:'·';position:absolute;left:0;color:#ff4d4d}
+footer{text-align:center;font-size:12px;color:#555;padding:18px;border-top:1px solid #222}
+footer a{color:#666;text-decoration:none}
+@keyframes flashRed{0%,100%{filter:none}50%{filter:brightness(3)}}
+.flash{animation:flashRed .3s ease}
+</style>
+</head>
+<body>
+<header><a href="../index.html">圧ゲー.jp</a><a href="../index.html">← ゲーム一覧</a></header>
+<div class="breadcrumb"><a href="../index.html">トップ</a> / 定時ダッシュ</div>
+<div class="hero">
+  <span class="emoji">🏃</span>
+  <h1>定時ダッシュ</h1>
+  <p class="desc">18:00。エレベーターが開いた一瞬だけが逃げ道だ。<br>上司は待ち伏せる。右端で立ち止まるな。<br>5回逃げ切れるまで、廊下に戻される。</p>
+  <div class="tags"><span>タイミング系</span><span>会社・オフィス</span><span>無料</span></div>
+</div>
+<div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+<div id="game-wrap">
+  <div id="status-bar">
+    <span>スコア <strong id="score-disp">0</strong></span>
+    <span id="clock-display">18:00:00</span>
+    <span>脱出 <strong id="escaped-disp">0</strong>/5</span>
+  </div>
+  <div id="gauge-wrap">
+    <span id="gauge-label">👔 注目度</span>
+    <div id="gauge-bar-bg"><div id="gauge-bar"></div></div>
+  </div>
+  <div id="game-canvas-area">
+    <div id="corridor">
+      <div class="wall-lamp" style="left:14%"></div>
+      <div class="wall-lamp" style="left:40%"></div>
+      <div class="wall-lamp" style="left:66%"></div>
+      <div class="floor-stripe"></div>
+    </div>
+    <div id="big-clock">18:00:00</div>
+    <div id="overstay-warn">右端に居すぎ！注目度急上昇</div>
+    <div id="player">🧍</div>
+    <div id="elev-frame"><span style="font-size:26px">🚪</span><span>ELV</span></div>
+    <div id="elev-door">🚪</div>
+    <div id="timebar-wrap"><div id="timebar"></div></div>
+    <div id="overlay">
+      <h2>🏃 定時ダッシュ</h2>
+      <p>上司がエレベーター前で待ち伏せしている。<br>ドアが開く一瞬だけが勝機。<br>右端にいすぎると注目度爆上がり。<br><strong>突っ込むタイミングが命。5回逃げ切れ。</strong></p>
+      <button class="btn" id="start-btn">▶ スタート</button>
+    </div>
+  </div>
+  <div id="mobile-controls">
+    <button id="btn-left">◀</button>
+    <button id="btn-right">▶</button>
+  </div>
+</div>
+<div class="how-to">
+  <h2>HOW TO PLAY</h2>
+  <ul>
+    <li>← → キーまたは画面下ボタンで左右移動</li>
+    <li>上司に近づくと注目度ゲージ上昇。MAXで「ちょっといい？」アウト</li>
+    <li><strong>エレベーター前（右端付近）で立ち止まると注目度が爆速上昇</strong> — 突っ込む瞬間だけ右へ</li>
+    <li>ドアが開いている一瞬にエレベーターに入ると脱出成功。すぐ左端に戻される</li>
+    <li>ラウンドが進むほど上司が増え、ドアが開く時間が短くなる</li>
+  </ul>
+</div>
+<footer>© 2025 圧ゲー.jp &nbsp;|&nbsp; <a href="../privacy.html">プライバシーポリシー</a> &nbsp;|&nbsp; <a href="../contact.html">お問い合わせ</a></footer>
+<script>
+// ====== 定数 ======
+const TOTAL_ROUNDS = 5;
+const PLAYER_SPEED = 5.5;
+const ELV_THRESHOLD = 0.84;
+const ATTENTION_MAX = 100;
+// ドアが開いている時間：ラウンドごとに短くなる
+const DOOR_OPEN_MS = [1600, 1300, 1100, 900, 750];
+// 右端待機ペナルティ：右端(>0.70)にいると注目度が急増
+const OVERSTAY_DRAIN_RATE = 0.9; // 毎tick増加量（通常の8倍）
+const OVERSTAY_THRESHOLD = 0.70;
+
+// ====== 状態 ======
+let state='idle', playerX=0.07, bosses=[], gauge=0, score=0, escaped=0;
+let currentRound=0, gameLoop=null, doorOpen=false, doorTimer=null;
+let keys={left:false,right:false}, bubbleTimer=null, clockMs=0, elapsed=0;
+let overstayFrames=0; // 右端滞在フレーム数
+
+const playerEl=document.getElementById('player');
+const elvDoor=document.getElementById('elev-door');
+const overlay=document.getElementById('overlay');
+const bigClock=document.getElementById('big-clock');
+const scoreDisp=document.getElementById('score-disp');
+const escapedDisp=document.getElementById('escaped-disp');
+const gaugeBar=document.getElementById('gauge-bar');
+const timebar=document.getElementById('timebar');
+const corridor=document.getElementById('corridor');
+const overstayWarn=document.getElementById('overstay-warn');
+
+function cw(){return document.getElementById('game-canvas-area').offsetWidth||480}
+function fmt(ms){const s=Math.floor(ms/1000);return `18:${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+
+function spawnBosses(){
+  document.querySelectorAll('.boss,.bubble').forEach(b=>b.remove());
+  bosses=[];
+  const count=2+Math.min(currentRound-1,4);
+  const emojis=['👔','🧑‍💼','👩‍💼','🕴️','👴','🧓'];
+  const phrases=['ちょっといい？','今いける？','これ頼める？','報告書は？','飲み会どう？','企画書ある？','来週の件','少しだけ'];
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className='boss';
+    const lbl=document.createElement('div'); lbl.className='boss-label';
+    lbl.textContent=phrases[Math.floor(Math.random()*phrases.length)];
+    el.textContent=emojis[i%emojis.length]; el.appendChild(lbl);
+    // ★ 後半の上司はエレベーター前（右端）に配置して待ち伏せ
+    let sx;
+    if(i===0 && currentRound>=2) sx=0.65+Math.random()*0.10; // 待ち伏せ役
+    else sx=0.05+Math.random()*0.55;
+    el.dataset.x=sx; el.dataset.dir=Math.random()>0.5?1:-1;
+    el.style.left=(sx*100)+'%';
+    corridor.appendChild(el); bosses.push(el);
+  }
+}
+
+function openDoor(){
+  doorOpen=true;
+  elvDoor.style.width='0'; elvDoor.style.opacity='0';
+  clearTimeout(doorTimer);
+  const openMs=DOOR_OPEN_MS[Math.min(currentRound-1,4)];
+  doorTimer=setTimeout(()=>closeDoor(),openMs);
+}
+function closeDoor(){doorOpen=false;elvDoor.style.width='58px';elvDoor.style.opacity='1';}
+
+function showBubble(text){
+  document.querySelectorAll('.bubble').forEach(b=>b.remove());
+  clearTimeout(bubbleTimer);
+  const b=document.createElement('div'); b.className='bubble'; b.textContent=text;
+  const px=playerX*cw();
+  b.style.left=Math.max(0,Math.min(px-50,cw()-160))+'px';
+  corridor.appendChild(b); bubbleTimer=setTimeout(()=>b.remove(),1500);
+}
+
+function startGame(){
+  state='playing'; playerX=0.07; gauge=0; score=0; escaped=0; currentRound=0; clockMs=0;
+  overlay.style.display='none'; overstayFrames=0; startRound();
+}
+
+function startRound(){
+  currentRound++; clockMs=0; elapsed=0; doorOpen=false; overstayFrames=0;
+  elvDoor.style.width='58px'; elvDoor.style.opacity='1';
+  playerX=0.07; playerEl.style.left=(playerX*100)+'%';
+  gauge=Math.max(0,gauge-18);
+  spawnBosses();
+  const ROUND_DUR=11000;
+  // ドアが開くタイミング：1回目は早め、2回目は遅め
+  const t1=1800+Math.random()*1200;
+  const t2=t1+3000+Math.random()*1500;
+  setTimeout(()=>{if(state==='playing')openDoor();},t1);
+  setTimeout(()=>{if(state==='playing'&&!doorOpen)openDoor();},t2);
+  timebar.style.width='100%';
+  clearInterval(gameLoop);
+  gameLoop=setInterval(()=>{
+    if(state!=='playing')return;
+    elapsed+=50; clockMs+=50;
+    bigClock.textContent=fmt(clockMs);
+    document.getElementById('clock-display').textContent=fmt(clockMs);
+    timebar.style.width=Math.max(0,(1-elapsed/ROUND_DUR)*100)+'%';
+    updatePlayer(); updateBosses(); checkOverstay(); checkCollision(); checkEscape();
+    if(elapsed>=ROUND_DUR)gameover('時間切れ。捕まった。');
+  },50);
+}
+
+function updatePlayer(){
+  const step=PLAYER_SPEED/cw();
+  if(keys.left)playerX=Math.max(0.02,playerX-step);
+  if(keys.right)playerX=Math.min(0.96,playerX+step);
+  playerEl.style.left=(playerX*100)+'%';
+  playerEl.textContent=(keys.left||keys.right)?'🏃':'🧍';
+}
+
+function checkOverstay(){
+  // 右端(0.70〜)で止まっていると注目度爆上がり
+  if(playerX>=OVERSTAY_THRESHOLD&&!doorOpen){
+    overstayFrames++;
+    if(overstayFrames>8){
+      gauge=Math.min(ATTENTION_MAX,gauge+OVERSTAY_DRAIN_RATE);
+      overstayWarn.style.opacity='1';
+    }
+  } else {
+    overstayFrames=0;
+    overstayWarn.style.opacity='0';
+  }
+}
+
+function updateBosses(){
+  const w=cw();
+  const speedMult=1+Math.min(currentRound-1,4)*0.32;
+  bosses.forEach(boss=>{
+    let bx=parseFloat(boss.dataset.x);
+    let dir=parseFloat(boss.dataset.dir);
+    // プレイヤー追尾（右端待機役は左右往復しつつ右寄り）
+    const attract=(playerX-bx)*0.006*speedMult;
+    bx+=(1.8/w)*dir*2*speedMult+attract;
+    if(bx<0.02){bx=0.02;dir=1;}
+    if(bx>0.80){bx=0.80;dir=-1;}
+    boss.dataset.x=bx; boss.dataset.dir=dir;
+    boss.style.left=(bx*100)+'%';
+  });
+}
+
+function checkCollision(){
+  let minDist=1;
+  bosses.forEach(boss=>{
+    const bx=parseFloat(boss.dataset.x);
+    const d=Math.abs(playerX-bx);
+    if(d<minDist)minDist=d;
+    if(d<0.07)gauge=Math.min(ATTENTION_MAX,gauge+0.55);
+    else if(d<0.14)gauge=Math.min(ATTENTION_MAX,gauge+0.18);
+  });
+  if(minDist>0.22&&playerX<OVERSTAY_THRESHOLD)gauge=Math.max(0,gauge-0.07);
+  gaugeBar.style.width=gauge+'%';
+  gaugeBar.style.background=gauge>70?'#ff4d4d':gauge>40?'#ffaa00':'#ffe066';
+  if(gauge>=ATTENTION_MAX)gameover('「ちょっといい？」\n捕まった…');
+}
+
+function checkEscape(){
+  if(doorOpen&&playerX>=ELV_THRESHOLD){
+    clearInterval(gameLoop);
+    escaped++; escapedDisp.textContent=escaped;
+    score+=100+Math.max(0,Math.floor(100-gauge));
+    scoreDisp.textContent=score;
+    showBubble('脱出！🎉');
+    if(escaped>=TOTAL_ROUNDS){setTimeout(()=>showResult(true),700);}
+    else{setTimeout(()=>{closeDoor();startRound();},750);}
+  }
+}
+
+function gameover(msg){
+  clearInterval(gameLoop); state='gameover';
+  playerEl.classList.add('flash');
+  setTimeout(()=>{playerEl.classList.remove('flash');},400);
+  setTimeout(()=>{
+    overlay.style.display='flex';
+    overlay.innerHTML=`<h2>💀 捕まった</h2><p style="white-space:pre-line">${msg}</p><div id="res-score">${score}</div><p style="color:#666;font-size:12px">脱出: ${escaped}/${TOTAL_ROUNDS}</p><button class="btn" onclick="startGame()">もう一度</button><button class="btn btn-sub" onclick="tw()">SNS共有</button>`;
+  },430);
+}
+function showResult(){
+  clearInterval(gameLoop); state='result';
+  overlay.style.display='flex';
+  overlay.innerHTML=`<h2>🎉 全脱出成功！</h2><p>5回全部逃げ切った。今夜は自由だ。</p><div id="res-score">${score}</div><button class="btn" onclick="startGame()">もう一度</button><button class="btn btn-sub" onclick="tw()">SNS共有</button>`;
+}
+function tw(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(`定時ダッシュ: ${score}点、${escaped}/5回脱出 #圧ゲー #定時ダッシュ`));}
+
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=true;if(e.key==='ArrowRight'||e.key==='d')keys.right=true;});
+document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=false;if(e.key==='ArrowRight'||e.key==='d')keys.right=false;});
+const bL=document.getElementById('btn-left'),bR=document.getElementById('btn-right');
+['touchstart','mousedown'].forEach(ev=>{
+  bL.addEventListener(ev,e=>{e.preventDefault?.();keys.left=true},{passive:false});
+  bR.addEventListener(ev,e=>{e.preventDefault?.();keys.right=true},{passive:false});
+});
+['touchend','mouseup'].forEach(ev=>{
+  bL.addEventListener(ev,e=>{e.preventDefault?.();keys.left=false},{passive:false});
+  bR.addEventListener(ev,e=>{e.preventDefault?.();keys.right=false},{passive:false});
+});
+document.getElementById('start-btn').addEventListener('click',startGame);
+</script>
+</body>
+</html>
