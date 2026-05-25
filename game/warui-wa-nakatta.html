@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>悪意はなかった。| 圧ゲー.jp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+:root{
+  --bg:#F7F6F3;--white:#fff;--border:#E0DED8;
+  --text:#1a1a18;--sub:#666460;--hint:#999790;
+  --teal-light:#E1F5EE;--teal-dark:#085041;--teal-mid:#0F6E56;
+  --red-light:#FCEBEB;--red-dark:#791F1F;--red-mid:#A32D2D;
+  --purple-light:#EEEDFE;--purple-dark:#26215C;--purple-mid:#3C3489;
+  --blue-light:#E6F1FB;--blue-dark:#042C53;
+  --green-light:#EAF3DE;--green-dark:#27500A;
+  --amber-light:#FAEEDA;--amber-dark:#412402;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;}
+.nav-back{font-size:13px;color:var(--sub);text-decoration:none;}
+
+/* SCREENS */
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* ===== TITLE SCREEN ===== */
+#s-title{background:var(--white);}
+.title-wrap{max-width:520px;margin:0 auto;padding:60px 24px 48px;text-align:center;}
+.title-eyebrow{font-size:11px;letter-spacing:.12em;color:var(--hint);margin-bottom:32px;}
+.title-main{font-size:clamp(32px,8vw,52px);font-weight:700;line-height:1.2;margin-bottom:8px;letter-spacing:-.01em;}
+.title-period{color:var(--red-mid);}
+.title-sub{font-size:13px;color:var(--sub);margin-bottom:6px;line-height:1.7;}
+.title-sub2{font-size:12px;color:var(--hint);margin-bottom:40px;line-height:1.7;}
+.title-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.tmeta{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--sub);}
+.title-btn{background:var(--text);color:var(--white);border:none;border-radius:10px;padding:15px 40px;font-size:15px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:opacity .15s;display:block;margin:0 auto 16px;}
+.title-btn:hover{opacity:.85;}
+.title-note{font-size:11px;color:var(--hint);line-height:1.7;}
+
+/* ===== GAME SCREEN ===== */
+.game-wrap{max-width:600px;margin:0 auto;padding:16px 16px 60px;}
+
+/* STATUS */
+.status-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.q-label{font-size:12px;color:var(--sub);white-space:nowrap;}
+.progress-track{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--text);border-radius:3px;transition:width .4s ease;}
+.score-label{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;}
+
+/* SCENE CARD */
+.scene-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;}
+.place-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--blue-light);color:var(--blue-dark);display:inline-block;margin-bottom:10px;}
+.scene-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.situation{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px;}
+.speech{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px;padding-left:14px;border-left:2px solid var(--border);}
+
+/* CHOICES */
+.choices{display:flex;flex-direction:column;gap:8px;}
+.ch-btn{width:100%;text-align:left;border-radius:10px;padding:12px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text);transition:background .12s,transform .1s;line-height:1.5;}
+.ch-btn:hover:not(:disabled){background:var(--bg);transform:translateY(-1px);}
+.ch-btn:disabled{opacity:.65;cursor:default;}
+.ch-alph{font-size:10px;font-weight:500;color:var(--hint);display:block;margin-bottom:2px;}
+.ch-btn.r-safe{background:var(--teal-light);border-color:#5DCAA5;color:var(--teal-dark);}
+.ch-btn.r-out{background:var(--red-light);border-color:#F09595;color:var(--red-dark);}
+.ch-btn.r-trap{background:var(--purple-light);border-color:#AFA9EC;color:var(--purple-dark);}
+
+/* FEEDBACK */
+.feedback{display:none;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:10px;}
+.fb-safe{background:var(--teal-light);color:var(--teal-mid);}
+.fb-out{background:var(--red-light);color:var(--red-mid);}
+.fb-trap{background:var(--purple-light);color:var(--purple-mid);}
+.fb-moya{background:var(--bg);color:var(--sub);border-left:3px solid #AFA9EC;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;margin-top:8px;display:none;line-height:1.65;}
+.fb-moya strong{color:var(--text);}
+
+.next-btn{display:none;width:100%;padding:13px;border-radius:10px;background:var(--text);color:var(--white);font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;margin-top:10px;}
+.next-btn:hover{opacity:.85;}
+
+/* ===== RESULT SCREEN ===== */
+#s-result{background:var(--white);}
+.result-wrap{max-width:520px;margin:0 auto;padding:48px 24px;text-align:center;}
+.result-icon{font-size:52px;margin-bottom:16px;}
+.result-score-label{font-size:13px;color:var(--hint);margin-bottom:4px;}
+.result-score{font-size:36px;font-weight:700;margin-bottom:16px;}
+.result-title{font-size:20px;font-weight:700;margin-bottom:10px;}
+.result-comment{font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:8px;max-width:420px;margin-left:auto;margin-right:auto;}
+.result-twist{font-size:13px;color:var(--hint);font-style:italic;margin-bottom:32px;line-height:1.7;}
+.result-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.btn-share{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:#1DA1F2;color:var(--white);border:none;}
+.btn-retry{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--text);color:var(--white);border:none;}
+.result-note{font-size:11px;color:var(--hint);line-height:1.7;}
+
+.ad-banner{background:var(--bg);border:1px dashed var(--border);color:var(--hint);font-size:11px;text-align:center;padding:10px;max-width:728px;margin:12px auto;}
+
+footer{background:var(--white);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--hint);}
+
+@keyframes bad-flash{0%{background:var(--white)}30%{background:#FCEBEB}100%{background:var(--white)}}
+.bad-flash{animation:bad-flash .5s ease;}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade-in{animation:fade-in .3s ease;}
+
+@media(max-width:480px){
+  .title-main{font-size:36px;}
+  .title-wrap{padding:40px 20px 36px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="#">圧ゲー.jp</a>
+  <a class="nav-back" href="#">← ゲーム一覧</a>
+</nav>
+
+<!-- TITLE -->
+<div class="screen on" id="s-title">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="title-wrap">
+    <p class="title-eyebrow">圧ゲー.jp presents</p>
+    <h1 class="title-main">悪意はなかった<span class="title-period">。</span></h1>
+    <p class="title-sub">「差別してない」は免罪符ではない。</p>
+    <p class="title-sub2">全10問。正解してもモヤる。<br>それがこのゲームの正体だ。</p>
+    <div class="title-meta">
+      <span class="tmeta">クイズ</span>
+      <span class="tmeta">全10問</span>
+      <span class="tmeta">人種差別回避</span>
+      <span class="tmeta">無料</span>
+    </div>
+    <button class="title-btn" onclick="startGame()">▶ はじめる</button>
+    <p class="title-note">このゲームは「無意識の偏見」をテーマにした皮肉系クイズです。<br>正解を知ることと、傷つけないことは別物かもしれない。</p>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="game-wrap">
+    <div class="status-bar">
+      <span class="q-label" id="q-label">Q1 / 10</span>
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <span class="score-label" id="score-label">正解 0</span>
+    </div>
+    <div class="scene-card fade-in" id="scene-card">
+      <span class="place-badge" id="place-badge"></span>
+      <div class="scene-title" id="scene-title"></div>
+      <div class="situation" id="situation"></div>
+      <div class="speech" id="speech"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="fb-moya" id="fb-moya"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="result-wrap">
+    <div class="result-icon" id="r-icon"></div>
+    <p class="result-score-label">10問中</p>
+    <p class="result-score" id="r-score"></p>
+    <p class="result-title" id="r-title"></p>
+    <p class="result-comment" id="r-comment"></p>
+    <p class="result-twist" id="r-twist"></p>
+    <div class="result-btns">
+      <button class="btn-share" onclick="share()">X でシェア</button>
+      <button class="btn-retry" onclick="retry()">もう一度</button>
+    </div>
+    <p class="result-note">全問正解してもモヤる。それがこのゲームの正体だ。</p>
+  </div>
+</div>
+
+<footer>© 2025 圧ゲー.jp</footer>
+
+<script>
+var SCENES = [
+  {
+    place:'🏢 職場 / 入社初日', title:'はじめての外国人同僚',
+    situ:'アメリカ育ちの同僚・ジェームズが今日入社した。廊下ですれ違い、目が合った。',
+    speech:'（沈黙。どう話しかける？）',
+    choices:[
+      {t:'safe',x:'「よろしくお願いします」と日本語で話しかける'},
+      {t:'out', x:'「日本語、お上手ですね！」と褒める'},
+      {t:'trap',x:'英語で「Welcome! Nice to meet you!」と話しかける'},
+    ],
+    fb:{
+      safe:'✔ 普通に接した。ただし後日「英語で話しかけてほしかった」と言われる余地は残る。',
+      out: '✕ 「外国人は日本語が下手なはず」という前提が一瞬で透けた。',
+      trap:'⚠ アメリカ育ちでも英語母語とは限らない。国籍と言語を直結させた。',
+    },
+    moya:'何を選んでも「もしかして失礼だったかも」という感覚が残る。これが日常。',
+  },
+  {
+    place:'🍱 社員食堂 / 昼', title:'ランチの話題選び',
+    situ:'インド出身のプリヤさんと隣になった。沈黙が続いている。',
+    speech:'（何か話したい）',
+    choices:[
+      {t:'safe',x:'「最近のお仕事、どうですか？」と聞く'},
+      {t:'out', x:'「カレー、好きですか？インドってカレー多いですよね」と話す'},
+      {t:'trap',x:'「インドのこと、いろいろ教えてほしいです！」と興味を示す'},
+    ],
+    fb:{
+      safe:'✔ 出身に触れなかった。ただし「仲良くなろうとしていない」と感じる人もいる。',
+      out: '✕ インド人＝カレー好きという決めつけ。インドの食文化は地域で全然違う。',
+      trap:'⚠ 善意だが「私をインドの広報として扱っている」と感じる人がいる。',
+    },
+    moya:'出身に触れると地雷、触れないと壁を作っていると思われる。どちらに転んでも正解ではない。',
+  },
+  {
+    place:'📋 会議室 / 朝礼', title:'名前が読めない',
+    situ:'司会を頼まれた。名簿に「Nguyễn Thị Hương」とある。本人が目の前にいる。',
+    speech:'「では次の方をご紹介ください」',
+    choices:[
+      {t:'safe',x:'「失礼ですが、読み方を教えていただけますか」と本人に聞く'},
+      {t:'out', x:'「えーと、外国籍の方です」と名前をスキップする'},
+      {t:'trap',x:'「グエン・ティ・フオン」と自信満々に読む'},
+    ],
+    fb:{
+      safe:'✔ 確認した。ただし「日本語っぽくない名前＝難しい」という判断が声に出ることがある。',
+      out: '✕ 読む努力すらしなかった。名前を省略された本人の気持ちは。',
+      trap:'⚠ 実際の発音とは全然違う。自信満々な間違いは静かな間違いより傷つくことがある。',
+    },
+    moya:'名前は個人のアイデンティティ。「難しい名前」という表現自体がすでに何かを言っている。',
+  },
+  {
+    place:'📱 SNS / 休日', title:'SNSの写真投稿',
+    situ:'韓国出身の友人・ジヨンさんと遊んだ。写真を投稿したい。キャプションをどうする？',
+    speech:'（投稿画面を開いている）',
+    choices:[
+      {t:'safe',x:'「今日も楽しかった！」とだけ書く'},
+      {t:'out', x:'「韓国人の友達ができた！」と書く'},
+      {t:'trap',x:'韓国国旗🇰🇷の絵文字を添える'},
+    ],
+    fb:{
+      safe:'✔ シンプルで無難。ただし「外国人の友達を隠したいの？」と言う人もいる。',
+      out: '✕ 国籍を前面に出した。友人を属性で紹介している。',
+      trap:'⚠ 本人の許可なく国籍を公開した。当人が「韓国人」として紹介されることを望んでいるとは限らない。',
+    },
+    moya:'友人の属性を出すことも隠すことも、どちらかへの意図として読まれる。',
+  },
+  {
+    place:'🍻 飲み会 / 夜', title:'「どこ出身ですか？」',
+    situ:'初対面の、外国人っぽい見た目の人と会話が弾んできた。出身が気になった。',
+    speech:'（どうする？）',
+    choices:[
+      {t:'safe',x:'聞かない。会話を楽しむ'},
+      {t:'out', x:'「どちらのご出身ですか？」と聞く'},
+      {t:'trap',x:'「ルーツはどちらですか？」と聞く'},
+    ],
+    fb:{
+      safe:'✔ 出身を聞かなかった。でも後で「私のこと興味なかったの？」となることもある。',
+      out: '✕ 見た目で「外国人だろう」と判断した。生まれも育ちも日本の人かもしれない。',
+      trap:'⚠ 「どこ出身？」をオブラートに包んだだけ。「ルーツ」という言葉自体が人種的な含みを持つ場合がある。',
+    },
+    moya:'見た目で判断した時点で、何を聞いても聞かなくてもその判断は相手に伝わっている。',
+  },
+  {
+    place:'🏢 会議室 / 評価面談', title:'評価面談での課題指摘',
+    situ:'部下のアミラさん（モロッコ出身）の面談。成果は出ているが、会議での発言が少ない。',
+    speech:'「今期の評価について話しましょう」',
+    choices:[
+      {t:'safe',x:'「会議でもう少し発言があると良いと思います」と具体的に伝える'},
+      {t:'out', x:'「日本のコミュニケーションスタイルに慣れると良いですよ」と言う'},
+      {t:'trap',x:'差別を恐れて課題には触れず、成果だけ評価する'},
+    ],
+    fb:{
+      safe:'✔ 行動ベースで話した。ただし「文化的な背景を無視した評価」と取られる可能性がある。',
+      out: '✕ 「日本式に合わせろ」という同化圧力。日本のやり方が正解という前提が丸見え。',
+      trap:'⚠ 正当な指摘を避けた。これも「特別扱い」であり、対等な評価ではない。',
+    },
+    moya:'指摘することも・しないことも、どちらも差別的と言われうる。公平とは何か。',
+  },
+  {
+    place:'🚃 満員電車 / 朝', title:'電車でスマホを落とした',
+    situ:'外国人っぽい見た目の人が隣に立っている。その人がスマホを落とした。',
+    speech:'（カランと音がした）',
+    choices:[
+      {t:'safe',x:'「落としましたよ」と日本語で声をかける'},
+      {t:'out', x:'英語で「You dropped this!」と言う'},
+      {t:'trap',x:'何も言わずスマホを拾って無言で渡す'},
+    ],
+    fb:{
+      safe:'✔ 普通に助けた。ただし「日本語で話しかけられると思っていなかった」という反応が返ることもある。',
+      out: '✕ 見た目で英語話者と判断した。日本生まれ日本育ちかもしれない。',
+      trap:'⚠ 言葉を選ぶのを回避した。でも「日本人には声をかけるのに私には無言だった」と感じる人がいる。',
+    },
+    moya:'助けようとした行為が、その方法によって差別の証拠になる。助けないのも差別になる。',
+  },
+  {
+    place:'🍺 居酒屋 / 夜', title:'差別発言を聞いてしまった',
+    situ:'飲み会で先輩が「最近外国人多くてさ〜、なんか嫌だよね」と言った。あなたに同意を求めてきた。',
+    speech:'「ね？わかるでしょ？」',
+    choices:[
+      {t:'safe',x:'「うーん、そうですかね」とぼかして流す'},
+      {t:'out', x:'「わかります〜」と笑って同調する'},
+      {t:'trap',x:'「それって差別じゃないですか？」とはっきり言う'},
+    ],
+    fb:{
+      safe:'✔ 場の空気を壊さなかった。でも同意したと取られる可能性がある。黙認は肯定に近い。',
+      out: '✕ 差別発言に加担した。その場を乗り切ったが共犯になった。',
+      trap:'⚠ 正論だ。先輩は傷ついた。その後の関係がぎこちなくなった。正しいことを言うコストは自分が払う。',
+    },
+    moya:'差別を指摘することは正しい。でもそのコストを指摘した側が払い続ける構造がある。',
+  },
+  {
+    place:'☕ 休憩室 / 午後', title:'ハーフの同僚への雑談',
+    situ:'日本とナイジェリアのハーフの同僚・ケイタさんと雑談中。「雰囲気が独特だな」とずっと思っている。',
+    speech:'「ケイタさんって、なんか雰囲気独特ですよね」',
+    choices:[
+      {t:'safe',x:'「ありがとうございます」と受け取って話題を変える'},
+      {t:'out', x:'「どこかにルーツがあるんですか？」と聞く'},
+      {t:'trap',x:'何も聞かず「そうですかね〜」と笑って終わらせる'},
+    ],
+    fb:{
+      safe:'✔ 深入りしなかった。でも「また濁された」と感じるケイタさんがいる可能性もある。',
+      out: '✕ 「雰囲気が違う＝外国の血が入っているはず」という決めつけが前提になっている。',
+      trap:'⚠ ケイタさんが自分のルーツを話したかった場合、その機会を奪ったことになる。沈黙も選択だ。',
+    },
+    moya:'聞くことも聞かないことも、相手の意思を決めつけている可能性がある。',
+  },
+  {
+    place:'🌐 オンライン会議 / 国際チーム', title:'「日本人って〜だよね」と言われた',
+    situ:'海外チームとの会議。アメリカ人のマイクが「日本人って意見言わないよね、なんで？」と言った。全員があなたを見ている。',
+    speech:'（日本人代表として答えを求められている）',
+    choices:[
+      {t:'safe',x:'「文化的な背景もあると思いますが、個人差もありますよ」と答える'},
+      {t:'out', x:'「そうですね、日本人は控えめなんです」と説明する'},
+      {t:'trap',x:'「それ、ステレオタイプじゃないですか？」とマイクに指摘する'},
+    ],
+    fb:{
+      safe:'✔ 丁寧に答えた。でも「日本人の代表として答えさせられた」という構図は変わっていない。',
+      out: '✕ ステレオタイプを自分で肯定して強化した。マイクの決めつけに乗っかった。',
+      trap:'⚠ 正しい。でも「日本人なのに反論してきた、扱いにくい」という空気になった。Q8と同じ構造。正しいことを言うコストは、言った側が払う。',
+    },
+    moya:'Q8と同じ構造で終わる。正しいことを言うコストは言った側が払い続ける。それでも言うかどうか——それがこのゲームの最後の問いだ。',
+  },
+];
+
+var RESULTS = [
+  {min:9, icon:'🏅', title:'意識高め系',
+   comment:'ほぼ全問正解した。素晴らしい。ただし「正解を知っている人」と「傷つけない人」は別物だ。',
+   twist:'あなたが次に無意識に傷つける日のことは、このゲームでは測れない。'},
+  {min:7, icon:'🙂', title:'まあまあ大丈夫な人',
+   comment:'「気にしてる」のは伝わる。でも「気にしてる」ことを相手は知らない。',
+   twist:'善意は伝わらなければ存在しない。'},
+  {min:5, icon:'😅', title:'惜しい人',
+   comment:'半分は正しかった。残り半分は「そのつもりじゃなかった」と言いながら傷つけた。',
+   twist:'「そのつもりじゃなかった」は相手の傷を消さない。'},
+  {min:3, icon:'😬', title:'無自覚な人',
+   comment:'悪意はなかった。本当に。でも悪意がないことと、傷つけないことは別の話だ。',
+   twist:'あなたの周りにいる外国人は、今日も何も言わずにいる。'},
+  {min:0, icon:'💀', title:'悪意はなかった（本人談）',
+   comment:'全問ほぼ外した。でも大丈夫。あなたのことを「差別主義者」と呼ぶ人はいない。みんな黙って離れていくだけだ。',
+   twist:'気づいていないだけで、もう始まっている。'},
+];
+
+var cur=0, score=0, answered=false, shuffled=[];
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function startGame(){
+  cur=0; score=0; answered=false;
+  show('s-game');
+  renderQ();
+}
+
+function renderQ(){
+  var s=SCENES[cur];
+  answered=false;
+  document.getElementById('q-label').textContent='Q'+(cur+1)+' / 10';
+  document.getElementById('prog').style.width=(cur/10*100)+'%';
+  document.getElementById('score-label').textContent='正解 '+score;
+  document.getElementById('place-badge').textContent=s.place;
+  document.getElementById('scene-title').textContent=s.title;
+  document.getElementById('situation').textContent=s.situ;
+  document.getElementById('speech').textContent=s.speech;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('fb-moya').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+
+  var grid=document.getElementById('choices');
+  grid.innerHTML='';
+  shuffled=shuffle([0,1,2]);
+  shuffled.forEach(function(origIdx, pos){
+    var c=s.choices[origIdx];
+    var btn=document.createElement('button');
+    btn.className='ch-btn';
+    btn.innerHTML='<span class="ch-alph">'+['A','B','C'][pos]+'</span>'+c.x;
+    (function(oi){btn.onclick=function(){pick(oi);};})(origIdx);
+    grid.appendChild(btn);
+  });
+
+  var card=document.getElementById('scene-card');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function pick(origIdx){
+  if(answered)return;
+  answered=true;
+  var s=SCENES[cur];
+  var c=s.choices[origIdx];
+  var isSafe=c.t==='safe';
+  if(isSafe)score++;
+
+  var btns=document.querySelectorAll('.ch-btn');
+  btns.forEach(function(b,pos){
+    b.disabled=true;
+    if(shuffled[pos]===origIdx) b.classList.add('r-'+c.t);
+  });
+
+  var fb=document.getElementById('feedback');
+  fb.textContent=s.fb[c.t];
+  fb.className='feedback fb-'+c.t;
+  fb.style.display='block';
+
+  var moya=document.getElementById('fb-moya');
+  moya.innerHTML='<strong>このシーンのモヤり：</strong>'+s.moya;
+  moya.style.display='block';
+
+  if(c.t==='out'||c.t==='trap'){
+    var card=document.getElementById('scene-card');
+    card.classList.add('bad-flash');
+    setTimeout(function(){card.classList.remove('bad-flash');},500);
+  }
+
+  document.getElementById('score-label').textContent='正解 '+score;
+  document.getElementById('next-btn').style.display='block';
+  document.getElementById('next-btn').textContent=cur<9?'次へ →':'結果を見る';
+}
+
+function nextQ(){
+  cur++;
+  if(cur>=10){showResult();return;}
+  renderQ();
+}
+
+function showResult(){
+  document.getElementById('prog').style.width='100%';
+  show('s-result');
+  var r=RESULTS[0];
+  for(var i=0;i<RESULTS.length;i++){
+    if(score>=RESULTS[i].min){r=RESULTS[i];break;}
+  }
+  document.getElementById('r-icon').textContent=r.icon;
+  document.getElementById('r-score').textContent=score+' 問正解';
+  document.getElementById('r-title').textContent=r.title;
+  document.getElementById('r-comment').textContent=r.comment;
+  document.getElementById('r-twist').textContent='→ '+r.twist;
+}
+
+function retry(){
+  cur=0;score=0;answered=false;
+  show('s-game');
+  renderQ();
+}
+
+function share(){
+  var r=RESULTS[0];
+  for(var i=0;i<RESULTS.length;i++){if(score>=RESULTS[i].min){r=RESULTS[i];break;}}
+  var txt='「悪意はなかった。」10問中'+score+'問正解。称号：'+r.title+'。\n「差別してないつもり」が一番危ない。\nhttps://100makeniki.github.io/atsu-game-/ #圧ゲーjp #悪意はなかった';
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt));
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>部下が爆弾。| 圧ゲー.jp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+:root{
+  --bg:#F7F6F3;--white:#fff;--border:#E0DED8;
+  --text:#1a1a18;--sub:#666460;--hint:#999790;
+  --red-light:#FCEBEB;--red-dark:#791F1F;--red-mid:#A32D2D;
+  --teal-light:#E1F5EE;--teal-dark:#085041;--teal-mid:#0F6E56;
+  --purple-light:#EEEDFE;--purple-dark:#26215C;--purple-mid:#3C3489;
+  --amber-light:#FAEEDA;--amber-dark:#412402;
+  --orange:#E8500A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;}
+.nav-back{font-size:13px;color:var(--sub);text-decoration:none;}
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* ===== TITLE ===== */
+#s-title{background:var(--white);}
+.title-wrap{max-width:520px;margin:0 auto;padding:56px 24px 44px;text-align:center;}
+.title-eyebrow{font-size:11px;letter-spacing:.12em;color:var(--hint);margin-bottom:24px;}
+.title-main{font-size:clamp(26px,7vw,44px);font-weight:700;line-height:1.25;margin-bottom:6px;}
+.title-accent{color:var(--orange);}
+.title-sub{font-size:13px;color:var(--sub);margin-bottom:5px;line-height:1.7;}
+.title-sub2{font-size:12px;color:var(--hint);margin-bottom:32px;line-height:1.7;}
+.title-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.tmeta{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--sub);}
+.title-btn{background:var(--text);color:var(--white);border:none;border-radius:10px;padding:15px 40px;font-size:15px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:block;margin:0 auto 14px;transition:opacity .15s;}
+.title-btn:hover{opacity:.85;}
+.title-note{font-size:11px;color:var(--hint);line-height:1.7;}
+
+/* ===== TIMER BAR ===== */
+.timer-wrap{position:sticky;top:0;z-index:10;background:var(--white);border-bottom:1px solid var(--border);padding:10px 16px;}
+.timer-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.timer-display{font-size:22px;font-weight:700;min-width:56px;font-variant-numeric:tabular-nums;transition:color .3s;}
+.timer-track{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.timer-fill{height:100%;border-radius:4px;transition:width .1s linear,background .3s;}
+.timer-safe{background:#639922;}
+.timer-warn{background:#EF9F27;}
+.timer-danger{background:#E24B4A;}
+.q-info{font-size:12px;color:var(--sub);white-space:nowrap;}
+
+/* ===== GAME ===== */
+.game-wrap{max-width:600px;margin:0 auto;padding:14px 16px 60px;}
+.scene-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;}
+.scene-badge-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.place-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:#FAEEDA;color:#412402;display:inline-block;}
+.photo-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--red-light);color:var(--red-dark);display:inline-block;}
+.scene-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.situation{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px;}
+.speech{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px;padding-left:14px;border-left:2px solid var(--border);}
+
+/* 写真カード */
+.photo-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.photo-frame{background:#222;border-radius:8px;padding:16px;margin-bottom:10px;font-size:13px;color:#eee;line-height:1.65;font-family:monospace;min-height:80px;}
+.photo-frame .highlight{color:#FFD700;}
+.photo-frame .danger-txt{color:#FF6B6B;}
+.photo-ok-ng{display:flex;gap:8px;}
+.photo-btn{flex:1;padding:11px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:none;transition:opacity .1s;}
+.photo-btn:hover:not(:disabled){opacity:.85;}
+.photo-btn:disabled{opacity:.6;cursor:default;}
+.photo-ok{background:var(--teal-light);color:var(--teal-dark);}
+.photo-ng{background:var(--red-light);color:var(--red-dark);}
+.photo-result{font-size:12px;padding:8px 10px;border-radius:6px;margin-top:8px;display:none;line-height:1.55;}
+.photo-result.correct{background:var(--teal-light);color:var(--teal-mid);}
+.photo-result.wrong{background:var(--red-light);color:var(--red-mid);}
+.photo-num{font-size:11px;color:var(--hint);margin-bottom:6px;}
+
+/* 選択肢 */
+.choices{display:flex;flex-direction:column;gap:8px;}
+.ch-btn{width:100%;text-align:left;border-radius:10px;padding:12px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text);transition:background .12s,transform .1s;line-height:1.5;}
+.ch-btn:hover:not(:disabled){background:var(--bg);transform:translateY(-1px);}
+.ch-btn:disabled{opacity:.65;cursor:default;}
+.ch-alph{font-size:10px;font-weight:500;color:var(--hint);display:block;margin-bottom:2px;}
+.ch-btn.r-safe{background:var(--teal-light);border-color:#5DCAA5;color:var(--teal-dark);}
+.ch-btn.r-bad{background:var(--red-light);border-color:#F09595;color:var(--red-dark);}
+.ch-btn.r-trap{background:var(--purple-light);border-color:#AFA9EC;color:var(--purple-dark);}
+
+/* フィードバック */
+.feedback{display:none;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:10px;}
+.fb-safe{background:var(--teal-light);color:var(--teal-mid);}
+.fb-bad{background:var(--red-light);color:var(--red-mid);}
+.fb-trap{background:var(--purple-light);color:var(--purple-mid);}
+.penalty-pop{display:none;font-size:13px;font-weight:700;color:var(--red-dark);padding:6px 0 0;text-align:center;}
+
+.next-btn{display:none;width:100%;padding:13px;border-radius:10px;background:var(--text);color:var(--white);font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;margin-top:10px;}
+.next-btn:hover{opacity:.85;}
+
+/* ===== RESULT ===== */
+#s-result,#s-gameover{background:var(--white);}
+.result-wrap{max-width:520px;margin:0 auto;padding:48px 24px;text-align:center;}
+.result-icon{font-size:52px;margin-bottom:14px;}
+.result-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.result-comment{font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:6px;max-width:400px;margin-left:auto;margin-right:auto;}
+.result-twist{font-size:13px;color:var(--hint);font-style:italic;margin-bottom:28px;line-height:1.7;}
+.result-stat{font-size:13px;color:var(--sub);margin-bottom:20px;}
+.result-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.btn-share{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:#1DA1F2;color:var(--white);border:none;}
+.btn-retry{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--text);color:var(--white);border:none;}
+
+.ad-banner{background:var(--bg);border:1px dashed var(--border);color:var(--hint);font-size:11px;text-align:center;padding:10px;max-width:728px;margin:12px auto;}
+footer{background:var(--white);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--hint);}
+@keyframes bad-flash{0%{background:var(--white)}25%{background:#FCEBEB}100%{background:var(--white)}}
+.bad-flash{animation:bad-flash .5s ease;}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade-in{animation:fade-in .25s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease;}
+@media(max-width:480px){.title-main{font-size:26px;}.title-wrap{padding:40px 20px 36px;}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="#">圧ゲー.jp</a>
+  <a class="nav-back" href="#">← ゲーム一覧</a>
+</nav>
+
+<!-- TITLE -->
+<div class="screen on" id="s-title">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="title-wrap">
+    <p class="title-eyebrow">圧ゲー.jp presents</p>
+    <h1 class="title-main">部下が<span class="title-accent">爆弾</span>。</h1>
+    <p class="title-sub">令和の部下は全員導火線付きだ。</p>
+    <p class="title-sub2">残り時間180秒。間違えるたびに時間が溶ける。<br>SNSテロ・退職代行・労基・写真流出——<br>全12問、爆発させずに駆け抜けろ。</p>
+    <div class="title-meta">
+      <span class="tmeta">タイムアタック</span>
+      <span class="tmeta">全12問</span>
+      <span class="tmeta">写真判定あり</span>
+      <span class="tmeta">無料</span>
+    </div>
+    <button class="title-btn" onclick="startGame()">▶ はじめる</button>
+    <p class="title-note">このゲームは「逆ハラスメント」をテーマにした皮肉系クイズです。<br>正解してもモヤる。時間が足りなくなってからが本番。</p>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="timer-wrap">
+    <div class="timer-inner">
+      <span class="timer-display" id="timer-display">3:00</span>
+      <div class="timer-track"><div class="timer-fill timer-safe" id="timer-fill" style="width:100%"></div></div>
+      <span class="q-info" id="q-info">Q1 / 12</span>
+    </div>
+  </div>
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="game-wrap">
+    <div class="scene-card fade-in" id="scene-card">
+      <div class="scene-badge-row">
+        <span class="place-badge" id="place-badge"></span>
+        <span id="photo-badge-el" style="display:none;" class="photo-badge">📷 写真判定</span>
+      </div>
+      <div class="scene-title" id="scene-title"></div>
+      <div class="situation" id="situation"></div>
+      <div class="speech" id="speech-wrap" style="display:none;"></div>
+      <div id="photo-area"></div>
+      <div class="choices" id="choices" style="display:none;"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="penalty-pop" id="penalty-pop"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="result-wrap">
+    <div class="result-icon" id="r-icon"></div>
+    <div class="result-title" id="r-title"></div>
+    <div class="result-comment" id="r-comment"></div>
+    <div class="result-twist" id="r-twist"></div>
+    <div class="result-stat" id="r-stat"></div>
+    <div class="result-btns">
+      <button class="btn-share" onclick="shareResult()">X でシェア</button>
+      <button class="btn-retry" onclick="retry()">もう一度</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAMEOVER -->
+<div class="screen" id="s-gameover">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="result-wrap">
+    <div class="result-icon">💥</div>
+    <div class="result-title">時間切れ</div>
+    <div class="result-comment" id="go-comment"></div>
+    <div class="result-twist" id="go-twist"></div>
+    <div class="result-stat" id="go-stat"></div>
+    <div class="result-btns">
+      <button class="btn-share" onclick="shareGameover()">X でシェア</button>
+      <button class="btn-retry" onclick="retry()">もう一度</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 圧ゲー.jp</footer>
+
+<script>
+var TOTAL_SEC = 180;
+
+// type: 'choice' or 'photo'
+// choices: {t:'safe'|'bad'|'trap', x:テキスト}
+// penalty: 秒数（正解は0）
+// fb: フィードバックテキスト
+var SCENES = [
+  {
+    type:'choice',
+    place:'🏢 オフィス / 18:00',
+    title:'18時に残業をお願いする',
+    situ:'定時ちょうど、部下の田中がPCを閉じようとしている。今夜中に仕上げたい資料がある。',
+    speech:'（田中がバッグを持ち上げた）',
+    choices:[
+      {t:'safe', x:'「急ぎじゃないけど、もし可能なら少し残れそう？ 無理なら全然いいよ」と声をかける',   penalty:0,  fb:'✔ 任意感を出した。ただし「上司に言われたら断れない」という空気は変わっていない。'},
+      {t:'bad',  x:'「今日中に仕上げてほしいんだけど、お願いできる？」とストレートに頼む',               penalty:20, fb:'💥 -20秒。「強制されました」と翌日労基に電話が入った。「お願い」でも受け取り方次第で強要になる。'},
+      {t:'trap', x:'「チームのためだから、できれば残ってほしいんだよね」と言う',                         penalty:20, fb:'💥 -20秒。「チームのため」という言葉が同調圧力と録音された。善意のフレームが一番刺さる。'},
+    ],
+  },
+  {
+    type:'choice',
+    place:'🏢 会議室 / 午後',
+    title:'資料のダメ出し',
+    situ:'部下の佐々木が提出した企画書。誤字・論理の飛躍・数字の根拠なし。全部やり直したい。',
+    speech:'「確認しました。いくつかフィードバックがあります」',
+    choices:[
+      {t:'safe', x:'「3点確認させてください」と言い、具体的な箇所を指摘する',                           penalty:0,  fb:'✔ 事実ベースの指摘。ただし「3点も！」と傷つく部下もいる。正解でも地雷は潜んでいる。'},
+      {t:'bad',  x:'「これ、ちゃんと考えて作った？」と率直に聞く',                                      penalty:20, fb:'💥 -20秒。「人格を否定された」と翌日HRに報告が入った。内容ではなく姿勢を問う言葉は全部アウト。'},
+      {t:'trap', x:'「もう少し丁寧に作り込んでほしかったな」と柔らかく伝える',                          penalty:10, fb:'⚠ -10秒。「丁寧に」「もう少し」など曖昧な言葉は「何がダメかわからない詰め」として録音価値が高い。'},
+    ],
+  },
+  {
+    type:'choice',
+    place:'🏢 エントランス / 9:15',
+    title:'今月3回目の遅刻',
+    situ:'部下の鈴木が15分遅れて出社。先手を打って「睡眠障害なんです。合理的配慮をしてください」と言ってきた。',
+    speech:'「すみません、睡眠障害の診断書を持ってきました」',
+    choices:[
+      {t:'safe', x:'「わかりました。HRと一緒に対応を考えましょう」と答える',                            penalty:0,  fb:'✔ 制度に乗っかった。ただし「人事に丸投げした」と後で言われることがある。'},
+      {t:'bad',  x:'「診断書があるなら仕方ないけど、チームへの影響も考えてほしい」と言う',              penalty:20, fb:'💥 -20秒。「障害を理由に叱責された」と労基に申告された。「チームへの影響」は禁句ワード。'},
+      {t:'trap', x:'「今後は在宅勤務にしましょうか？」と配慮を示す',                                    penalty:10, fb:'⚠ -10秒。善意だが本人の合意なく就業形態を変更しようとした。「勝手に決めないでほしい」と言われた。'},
+    ],
+  },
+  {
+    type:'photo',
+    place:'📱 部下のスマホ / 昼休み',
+    title:'「これ、SNSに上げてもいいですか？」',
+    situ:'部下の松本が「会社の雰囲気を発信したい」と言って3枚の写真を見せてきた。OK・NGを即判断しろ。',
+    photos:[
+      {
+        desc:'📸 写真1',
+        content:'【オフィス全景】\nオープンスペース。\n奥に「来期売上目標：█億円」と書かれた\nホワイトボードが映り込んでいる。\n社員は写っていない。',
+        answer:'ng',
+        fb:'NG。売上目標は社外秘情報。「社員が写っていない」は関係ない。数字が見えた時点でアウト。'
+      },
+      {
+        desc:'📸 写真2',
+        content:'【休憩スペース】\nコーヒーメーカーとソファ。\n誰も写っておらず、\n書類・PC・ホワイトボードなし。\n「いい雰囲気ですね」という感じの写真。',
+        answer:'ok',
+        fb:'OK。個人情報なし、社外秘情報なし。この程度なら問題ない。ただし会社によってはSNSポリシーで制限している場合も。'
+      },
+      {
+        desc:'📸 写真3',
+        content:'【ランチ写真】\n社員3名で撮った集合写真。\n顔がはっきり写っている。\n背景に社名入りのパーテーションが見える。',
+        answer:'ng',
+        fb:'NG。本人の同意なく顔写真を投稿することは個人情報違反。社名が映るのも会社判断が必要。'
+      },
+    ],
+  },
+  {
+    type:'choice',
+    place:'🍺 社内 / 17:30',
+    title:'飲み会への声かけ',
+    situ:'チームの親睦飲み会。「任意参加」と案内したが、部下の中村だけ来ない。どうする？',
+    speech:'（中村は黙々と仕事している）',
+    choices:[
+      {t:'safe', x:'何も言わない。来ない自由を尊重する',                                               penalty:0,  fb:'✔ 任意を貫いた。ただし後日「チームから孤立しているのに放置された」と言われる可能性はある。'},
+      {t:'bad',  x:'「せっかくだし来ない？チームのことも知ってほしくて」と声をかける',                 penalty:30, fb:'💥 -30秒。「強制参加させられた」とその夜のうちにXに投稿された。「声をかける」だけで強制になる時代。'},
+      {t:'trap', x:'「来なくても全然いいんだけど、一応声だけかけておこうと思って」と言う',             penalty:20, fb:'💥 -20秒。「全然いいんだけど」の後に「一応」をつけた瞬間に圧になる。言葉のクッションが逆効果。'},
+    ],
+  },
+  {
+    type:'choice',
+    place:'🏢 会議室 / 緊急',
+    title:'ミスを問い詰めたい',
+    situ:'部下の高橋が大事なクライアントへの送付ミスを1週間隠蔽していた。今発覚した。怒りたい。',
+    speech:'「高橋さん、少し話せますか」',
+    choices:[
+      {t:'safe', x:'「事実確認だけさせてください。何があったか順を追って教えてもらえますか」と言う',     penalty:0,  fb:'✔ 感情を出さず事実確認に徹した。ただし「冷たい詰め方」と言われる可能性もある。正解でも詰めは詰め。'},
+      {t:'bad',  x:'「なんで1週間も隠してたの？」と聞く',                                              penalty:20, fb:'💥 -20秒。「責め立てるような聞き方をされた」と録音された。「なんで」は詰問ワード第1位。'},
+      {t:'trap', x:'「今後のためにも、正直に話してほしい」と穏やかに促す',                             penalty:10, fb:'⚠ -10秒。「今後のためにも」という前置きが「脅しに聞こえた」と後でHRに伝わった。'},
+    ],
+  },
+  {
+    type:'photo',
+    place:'📱 Instagram / 夜',
+    title:'部下のインスタに会社が映っていた',
+    situ:'部下の田辺のInstagramを偶然見た。3枚の投稿がある。放置していいか、NGとして指摘するか判断しろ。',
+    photos:[
+      {
+        desc:'📸 投稿1',
+        content:'【ストーリーズ】\n「今日もお疲れ！」というテキスト。\n背景はぼかし加工されているが、\nうっすら社名ロゴが見える。',
+        answer:'ng',
+        fb:'NG。ぼかしがあっても社名ロゴが判別できる場合は会社情報の漏洩になりうる。本人は悪意なし——だから余計に厄介。'
+      },
+      {
+        desc:'📸 投稿2',
+        content:'【フィード投稿】\n「ランチ美味しかった🍜」\n近所のラーメン屋の写真のみ。\n会社・社員・書類一切写っていない。',
+        answer:'ok',
+        fb:'OK。完全にプライベートの投稿。これをNGにしたら逆にプライバシー侵害になる。'
+      },
+      {
+        desc:'📸 投稿3',
+        content:'【フィード投稿】\n「新しいプロジェクト始まったよ」\nPCの画面が写り込んでいる。\n画面には「█社向け提案書」という\nタイトルが読めてしまう。',
+        answer:'ng',
+        fb:'NG。クライアント名が読み取れる画面が写っている。情報漏洩リスク大。悪意のない「映り込み」が一番対処が難しい。'
+      },
+    ],
+  },
+  {
+    type:'choice',
+    place:'📞 朝 / 9:00',
+    title:'退職代行から電話が来た',
+    situ:'見知らぬ番号から「○○さんの退職代行を担当しております。本日付けで退職の意向をお伝えします」と電話が来た。',
+    speech:'「本人への連絡はお控えください」',
+    choices:[
+      {t:'safe', x:'「承りました。会社の手続きについてはHRから連絡します」と答えて電話を切る',          penalty:0,  fb:'✔ 正しい対応。ただし「あっさり受け入れすぎ」と後で言われることがある。どうしても何かに引っかかる。'},
+      {t:'bad',  x:'「本人と直接話したい。繋いでもらえますか」と伝える',                               penalty:30, fb:'💥 -30秒。「接触禁止を無視した」として弁護士から通知書が届いた。退職代行への接触要求は完全にアウト。'},
+      {t:'trap', x:'電話を切った後、本人にLINEで「話したい」と送る',                                   penalty:30, fb:'💥 -30秒。代行会社経由ではなく直接連絡した。これも接触禁止違反。LINEだろうとメールだろうと同じ。'},
+    ],
+  },
+  {
+    type:'choice',
+    place:'🏢 個室 / 午後',
+    title:'「給料上げてもらえないと辞めます」',
+    situ:'入社1年の部下・渡辺が突然「転職先から内定をもらいました。給料を上げてくれないと来月辞めます」と言ってきた。',
+    speech:'「他社から年収100万アップの提示をもらっています」',
+    choices:[
+      {t:'safe', x:'「一度持ち帰らせてください。上と相談します」と答える',                              penalty:0,  fb:'✔ 即答を避けた。ただし「引き止めなかった」と後でチームに不満が広がることがある。'},
+      {t:'bad',  x:'「そういう交渉の仕方はどうかと思うけど」と苦言を呈する',                           penalty:30, fb:'💥 -30秒。「退職を引き止めようとした上に説教された」とその日の夜にXに会社名入りで投稿された。'},
+      {t:'trap', x:'「その給与水準は今の会社では難しいですね」と正直に答える',                          penalty:20, fb:'💥 -20秒。「給与交渉を頭ごなしに否定された」と解釈されスクショを撮られた。正直な回答も証拠になる。'},
+    ],
+  },
+  {
+    type:'choice',
+    place:'🏢 オフィス / 繁忙期',
+    title:'繁忙期に全有給宣言',
+    situ:'最も忙しい月末、部下の小林が「来週から10日間、有給を全部使い切ります」と申請してきた。',
+    speech:'「権利なので使わせてもらいます」',
+    choices:[
+      {t:'safe', x:'「わかりました。業務の引き継ぎだけ確認させてください」と答える',                    penalty:0,  fb:'✔ 権利を認めた上で業務調整を依頼した。ただし「引き継ぎを強要された」と言われる可能性は残る。'},
+      {t:'bad',  x:'「この時期はちょっと困るんだけど…」と困惑を示す',                                  penalty:20, fb:'💥 -20秒。「有給取得を妨害しようとした」として翌日労基に相談が入った。「困る」は言ってはいけない言葉。'},
+      {t:'trap', x:'「来月以降にずらすことは可能ですか？」と穏やかに聞く',                             penalty:20, fb:'💥 -20秒。「時季変更権の行使と見せかけた取得妨害」と判断された。穏やかな聞き方も証拠になる。'},
+    ],
+  },
+  {
+    type:'photo',
+    place:'📱 グループLINE / 夜',
+    title:'これ、グループLINEに送っていい？',
+    situ:'飲み会帰り、部下の谷が「思い出に！」と言って3枚の写真を社内グループLINEに送ろうとしている。止めるか止めないか。',
+    photos:[
+      {
+        desc:'📸 写真1',
+        content:'【飲み会写真】\n参加者5名の集合写真。\n全員が笑顔で写っている。\n場所は居酒屋で会社名は映っていない。\n全員が社内メンバー。',
+        answer:'ok',
+        fb:'OK（条件付き）。全員が社内メンバーで社外への流出でなければ、グループLINE内での共有は許容範囲。ただし全員の同意があることが前提。'
+      },
+      {
+        desc:'📸 写真2',
+        content:'【帰り道スナップ】\n部下2名のツーショット。\n片方が目をつぶっている。\n背景に会社のビルの入口が映っている。',
+        answer:'ng',
+        fb:'NG。本人確認なしで掲載。目をつぶった写真を本人が嫌がる場合がある。「グループLINEだから」は免責にならない。'
+      },
+      {
+        desc:'📸 写真3',
+        content:'【席の写真】\n料理と飲み物だけのテーブル写真。\n人物なし・書類なし・PC なし。\n店名のロゴ入りグラスが写っている。',
+        answer:'ok',
+        fb:'OK。人物・社内情報が一切写っていない。店名ロゴは問題なし。これをNGにすると過剰規制になる。'
+      },
+    ],
+  },
+  {
+    type:'choice',
+    place:'💻 深夜 / 自宅',
+    title:'Glassdoorに書かれた',
+    situ:'会社の口コミサイトに「直属の上司が昭和体質で、感情的に詰めてくる。令和にこんな管理職がいるとは思わなかった」と書かれていた。明らかに自分のことだ。',
+    speech:'（部下が全員怪しい）',
+    choices:[
+      {t:'safe', x:'誰が書いたか探らず、自分の言動を振り返る',                                         penalty:0,  fb:'✔ 正しい反応。ただし「振り返っても何も変わらない」と部下は思っている可能性がある。'},
+      {t:'bad',  x:'「誰が書いたんだろう」と部下全員の様子を観察し始める',                             penalty:30, fb:'💥 -30秒。「犯人探しをされている」と感じた別の部下が「監視されている」とさらに投稿した。'},
+      {t:'trap', x:'翌日の朝礼で「最近こういうことがあって」と全体に向けて話す',                        penalty:20, fb:'💥 -20秒。書いた本人が「特定しようとした」と受け取り、スクショ付きで拡散した。全体共有は燃料になる。'},
+    ],
+  },
+];
+
+var RESULTS = [
+  {min:120, icon:'🏆', title:'奇跡の生存',
+   comment:'全員爆発させずに駆け抜けた。残り時間もある。ただし部下は全員、転職サイトを開いている。',
+   twist:'「在職中の転職活動」は止める方法がない。'},
+  {min:60,  icon:'😤', title:'ギリギリ管理職',
+   comment:'なんとか乗り切った。いくつか爆発させたが、会社はまだ燃えていない。',
+   twist:'燃えていないだけで、くすぶっている。'},
+  {min:1,   icon:'😰', title:'消耗した上司',
+   comment:'時間がギリギリだった。正解したのに何もモヤが晴れない。それがこのゲームの正体だ。',
+   twist:'正解を知っている上司と、部下が安心して働ける上司は別物だ。'},
+];
+
+var GAMEOVER_MSGS = [
+  {q:3,  comment:'Q3で時間切れ。遅刻対応で詰んだ。合理的配慮の4文字で思考が止まった。',        twist:'「睡眠障害」は現代の最強盾だ。'},
+  {q:6,  comment:'Q6で時間切れ。ミスの問い詰め方で詰んだ。「なんで」を言った瞬間に録音が始まっていた。', twist:'怒りを持ったまま話しかけた時点で負けていた。'},
+  {q:8,  comment:'Q8で時間切れ。退職代行に対応できなかった。「本人と話したい」が弁護士を呼んだ。', twist:'退職代行は昭和の管理職を倒すために生まれた。'},
+  {q:99, comment:'時間切れ。最後まで届かなかった。令和の部下は3分では到底捌き切れない。',         twist:'これが毎日続く。定年まで。'},
+];
+
+var timeLeft = TOTAL_SEC;
+var timerInterval = null;
+var cur = 0;
+var answered = false;
+var shuffled = [];
+var photoAnswered = [];
+var photoResults = [];
+var totalPenalty = 0;
+var finishedQ = 0;
+
+function startGame(){
+  timeLeft = TOTAL_SEC; cur = 0; answered = false;
+  totalPenalty = 0; finishedQ = 0;
+  show('s-game');
+  startTimer();
+  renderQ();
+}
+
+function startTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function(){
+    timeLeft -= 0.1;
+    if(timeLeft <= 0){ timeLeft = 0; updateTimerUI(); clearInterval(timerInterval); gameOver(); return; }
+    updateTimerUI();
+  }, 100);
+}
+
+function updateTimerUI(){
+  var m = Math.floor(timeLeft / 60);
+  var s = Math.floor(timeLeft % 60);
+  var ms = Math.floor((timeLeft % 1) * 10);
+  document.getElementById('timer-display').textContent =
+    m + ':' + (s < 10 ? '0' : '') + s;
+  var pct = timeLeft / TOTAL_SEC * 100;
+  var fill = document.getElementById('timer-fill');
+  fill.style.width = pct + '%';
+  var disp = document.getElementById('timer-display');
+  if(pct > 50){ fill.className = 'timer-fill timer-safe'; disp.style.color = '#27500A'; }
+  else if(pct > 25){ fill.className = 'timer-fill timer-warn'; disp.style.color = '#633806'; }
+  else { fill.className = 'timer-fill timer-danger'; disp.style.color = '#791F1F'; }
+}
+
+function applyPenalty(sec){
+  if(sec <= 0) return;
+  totalPenalty += sec;
+  timeLeft = Math.max(0, timeLeft - sec);
+  updateTimerUI();
+  var pop = document.getElementById('penalty-pop');
+  pop.textContent = '💥 -' + sec + '秒';
+  pop.style.display = 'block';
+  var card = document.getElementById('scene-card');
+  card.classList.add('shake');
+  setTimeout(function(){ card.classList.remove('shake'); pop.style.display = 'none'; }, 800);
+  if(timeLeft <= 0){ clearInterval(timerInterval); setTimeout(gameOver, 900); }
+}
+
+function renderQ(){
+  answered = false;
+  photoAnswered = [];
+  photoResults = [];
+  var s = SCENES[cur];
+  document.getElementById('q-info').textContent = 'Q'+(cur+1)+' / '+SCENES.length;
+  document.getElementById('place-badge').textContent = s.place;
+  document.getElementById('scene-title').textContent = s.title;
+  document.getElementById('situation').textContent = s.situ;
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('penalty-pop').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+
+  var photoBadge = document.getElementById('photo-badge-el');
+  var speechWrap = document.getElementById('speech-wrap');
+  var photoArea = document.getElementById('photo-area');
+  var choicesDiv = document.getElementById('choices');
+  photoArea.innerHTML = '';
+  choicesDiv.innerHTML = '';
+
+  if(s.type === 'photo'){
+    photoBadge.style.display = 'inline-block';
+    speechWrap.style.display = 'none';
+    choicesDiv.style.display = 'none';
+    renderPhotos(s);
+  } else {
+    photoBadge.style.display = 'none';
+    speechWrap.style.display = 'block';
+    speechWrap.textContent = s.speech;
+    choicesDiv.style.display = 'flex';
+    renderChoices(s);
+  }
+
+  var card = document.getElementById('scene-card');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function renderPhotos(s){
+  var photoArea = document.getElementById('photo-area');
+  s.photos.forEach(function(p, i){
+    var div = document.createElement('div');
+    div.className = 'photo-card';
+    div.id = 'photo-card-' + i;
+    div.innerHTML =
+      '<div class="photo-num">' + p.desc + '（' + (i+1) + ' / ' + s.photos.length + '）</div>' +
+      '<div class="photo-frame">' + p.content + '</div>' +
+      '<div class="photo-ok-ng">' +
+        '<button class="photo-btn photo-ok" id="pok-'+i+'" onclick="answerPhoto('+i+',\'ok\')">✔ OK</button>' +
+        '<button class="photo-btn photo-ng" id="png-'+i+'" onclick="answerPhoto('+i+',\'ng\')">✕ NG</button>' +
+      '</div>' +
+      '<div class="photo-result" id="photo-result-'+i+'"></div>';
+    photoArea.appendChild(div);
+    photoAnswered.push(false);
+    photoResults.push(null);
+  });
+}
+
+function answerPhoto(idx, ans){
+  if(photoAnswered[idx]) return;
+  photoAnswered[idx] = true;
+  var s = SCENES[cur];
+  var p = s.photos[idx];
+  var correct = ans === p.answer;
+  photoResults[idx] = correct;
+
+  document.getElementById('pok-'+idx).disabled = true;
+  document.getElementById('png-'+idx).disabled = true;
+
+  var res = document.getElementById('photo-result-'+idx);
+  res.style.display = 'block';
+  res.className = 'photo-result ' + (correct ? 'correct' : 'wrong');
+  res.textContent = (correct ? '✔ ' : '✕ ') + p.fb;
+
+  if(!correct) applyPenalty(30);
+
+  // 全部答えたら次へボタン
+  if(photoAnswered.every(function(v){ return v; })){
+    document.getElementById('next-btn').style.display = 'block';
+    document.getElementById('next-btn').textContent = cur < SCENES.length - 1 ? '次へ →' : '結果を見る';
+  }
+}
+
+function renderChoices(s){
+  var grid = document.getElementById('choices');
+  shuffled = shuffle([0, 1, 2]);
+  shuffled.forEach(function(origIdx, pos){
+    var c = s.choices[origIdx];
+    var btn = document.createElement('button');
+    btn.className = 'ch-btn';
+    btn.innerHTML = '<span class="ch-alph">' + ['A','B','C'][pos] + '</span>' + c.x;
+    (function(oi){ btn.onclick = function(){ pickChoice(oi); }; })(origIdx);
+    grid.appendChild(btn);
+  });
+}
+
+function pickChoice(origIdx){
+  if(answered) return;
+  answered = true;
+  var s = SCENES[cur];
+  var c = s.choices[origIdx];
+
+  document.querySelectorAll('.ch-btn').forEach(function(b, pos){
+    b.disabled = true;
+    if(shuffled[pos] === origIdx){
+      b.classList.add(c.t === 'safe' ? 'r-safe' : c.t === 'trap' ? 'r-trap' : 'r-bad');
+    }
+  });
+
+  var fb = document.getElementById('feedback');
+  fb.textContent = c.fb;
+  fb.className = 'feedback ' + (c.t === 'safe' ? 'fb-safe' : c.t === 'trap' ? 'fb-trap' : 'fb-bad');
+  fb.style.display = 'block';
+
+  if(c.penalty > 0){
+    applyPenalty(c.penalty);
+    document.getElementById('scene-card').classList.add('bad-flash');
+    setTimeout(function(){ document.getElementById('scene-card').classList.remove('bad-flash'); }, 500);
+  }
+
+  if(timeLeft > 0){
+    var nb = document.getElementById('next-btn');
+    nb.style.display = 'block';
+    nb.textContent = cur < SCENES.length - 1 ? '次へ →' : '結果を見る';
+  }
+}
+
+function nextQ(){
+  finishedQ = cur + 1;
+  cur++;
+  if(cur >= SCENES.length){ clearInterval(timerInterval); showResult(); return; }
+  renderQ();
+}
+
+function showResult(){
+  show('s-result');
+  var r = RESULTS[RESULTS.length - 1];
+  for(var i = 0; i < RESULTS.length; i++){ if(timeLeft >= RESULTS[i].min){ r = RESULTS[i]; break; } }
+  document.getElementById('r-icon').textContent = r.icon;
+  document.getElementById('r-title').textContent = r.title;
+  document.getElementById('r-comment').textContent = r.comment;
+  document.getElementById('r-twist').textContent = '→ ' + r.twist;
+  document.getElementById('r-stat').textContent =
+    '残り時間：' + Math.floor(timeLeft) + '秒 　ペナルティ合計：-' + totalPenalty + '秒';
+}
+
+function gameOver(){
+  show('s-gameover');
+  var msg = GAMEOVER_MSGS[GAMEOVER_MSGS.length - 1];
+  for(var i = 0; i < GAMEOVER_MSGS.length; i++){
+    if(cur < GAMEOVER_MSGS[i].q){ msg = GAMEOVER_MSGS[i]; break; }
+  }
+  document.getElementById('go-comment').textContent = msg.comment;
+  document.getElementById('go-twist').textContent = '→ ' + msg.twist;
+  document.getElementById('go-stat').textContent =
+    'Q' + (cur + 1) + 'で時間切れ　ペナルティ合計：-' + totalPenalty + '秒';
+}
+
+function retry(){
+  clearInterval(timerInterval);
+  timeLeft = TOTAL_SEC; cur = 0; answered = false;
+  totalPenalty = 0; finishedQ = 0;
+  show('s-game');
+  startTimer();
+  renderQ();
+}
+
+function shareResult(){
+  var txt = '「部下が爆弾。」全12問クリア！残り' + Math.floor(timeLeft) + '秒。令和の部下は全員導火線付きだ。 #圧ゲーjp #部下が爆弾';
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt));
+}
+function shareGameover(){
+  var txt = '「部下が爆弾。」Q' + (cur + 1) + 'で時間切れ。ペナルティ-' + totalPenalty + '秒。令和の管理職は3分も持たない。 #圧ゲーjp #部下が爆弾';
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt));
+}
+
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

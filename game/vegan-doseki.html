@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>気を遣っても怒られる。| 圧ゲー.jp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+:root{
+  --bg:#F7F6F3;--white:#fff;--border:#E0DED8;
+  --text:#1a1a18;--sub:#666460;--hint:#999790;
+  --green-light:#EAF3DE;--green-dark:#27500A;--green-mid:#3B6D11;
+  --teal-light:#E1F5EE;--teal-dark:#085041;--teal-mid:#0F6E56;
+  --red-light:#FCEBEB;--red-dark:#791F1F;--red-mid:#A32D2D;
+  --purple-light:#EEEDFE;--purple-dark:#26215C;--purple-mid:#3C3489;
+  --amber-light:#FAEEDA;--amber-dark:#412402;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;}
+.nav-back{font-size:13px;color:var(--sub);text-decoration:none;}
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* TITLE */
+#s-title{background:var(--white);}
+.title-wrap{max-width:520px;margin:0 auto;padding:60px 24px 48px;text-align:center;}
+.title-eyebrow{font-size:11px;letter-spacing:.12em;color:var(--hint);margin-bottom:28px;}
+.title-main{font-size:clamp(24px,6vw,40px);font-weight:700;line-height:1.3;margin-bottom:6px;letter-spacing:-.01em;}
+.title-accent{color:#639922;}
+.title-sub{font-size:13px;color:var(--sub);margin-bottom:6px;line-height:1.7;}
+.title-sub2{font-size:12px;color:var(--hint);margin-bottom:36px;line-height:1.7;}
+.title-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.tmeta{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--sub);}
+.title-btn{background:var(--text);color:var(--white);border:none;border-radius:10px;padding:15px 40px;font-size:15px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:block;margin:0 auto 16px;transition:opacity .15s;}
+.title-btn:hover{opacity:.85;}
+.title-note{font-size:11px;color:var(--hint);line-height:1.7;}
+
+/* POV TOGGLE */
+.pov-banner{background:var(--green-light);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--green-dark);font-weight:500;margin-bottom:12px;display:none;text-align:center;}
+
+/* GAME */
+.game-wrap{max-width:600px;margin:0 auto;padding:16px 16px 60px;}
+.status-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.q-label{font-size:12px;color:var(--sub);white-space:nowrap;}
+.progress-track{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:#639922;border-radius:3px;transition:width .4s ease;}
+.score-label{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;}
+.scene-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;}
+.place-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--green-light);color:var(--green-dark);display:inline-block;margin-bottom:6px;}
+.pov-badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:999px;margin-left:6px;display:inline-block;}
+.pov-meat{background:#FAEEDA;color:#412402;}
+.pov-vegan{background:var(--green-light);color:var(--green-dark);}
+.scene-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.situation{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px;}
+.speech{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px;padding-left:14px;border-left:2px solid var(--border);}
+.choices{display:flex;flex-direction:column;gap:8px;}
+.ch-btn{width:100%;text-align:left;border-radius:10px;padding:12px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text);transition:background .12s,transform .1s;line-height:1.5;}
+.ch-btn:hover:not(:disabled){background:var(--bg);transform:translateY(-1px);}
+.ch-btn:disabled{opacity:.65;cursor:default;}
+.ch-alph{font-size:10px;font-weight:500;color:var(--hint);display:block;margin-bottom:2px;}
+.ch-btn.r-safe{background:var(--teal-light);border-color:#5DCAA5;color:var(--teal-dark);}
+.ch-btn.r-out{background:var(--red-light);border-color:#F09595;color:var(--red-dark);}
+.ch-btn.r-trap{background:var(--purple-light);border-color:#AFA9EC;color:var(--purple-dark);}
+.feedback{display:none;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:10px;}
+.fb-safe{background:var(--teal-light);color:var(--teal-mid);}
+.fb-out{background:var(--red-light);color:var(--red-mid);}
+.fb-trap{background:var(--purple-light);color:var(--purple-mid);}
+.fb-moya{background:var(--bg);color:var(--sub);border-left:3px solid #639922;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;margin-top:8px;display:none;line-height:1.65;}
+.fb-moya strong{color:var(--text);}
+.next-btn{display:none;width:100%;padding:13px;border-radius:10px;background:var(--text);color:var(--white);font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;margin-top:10px;}
+.next-btn:hover{opacity:.85;}
+
+/* RESULT */
+#s-result{background:var(--white);}
+.result-wrap{max-width:520px;margin:0 auto;padding:48px 24px;text-align:center;}
+.result-icon{font-size:52px;margin-bottom:16px;}
+.result-score-label{font-size:13px;color:var(--hint);margin-bottom:4px;}
+.result-score{font-size:36px;font-weight:700;margin-bottom:16px;}
+.result-title{font-size:20px;font-weight:700;margin-bottom:10px;}
+.result-comment{font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:8px;max-width:420px;margin-left:auto;margin-right:auto;}
+.result-twist{font-size:13px;color:var(--hint);font-style:italic;margin-bottom:32px;line-height:1.7;}
+.result-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.btn-share{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:#1DA1F2;color:var(--white);border:none;}
+.btn-retry{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--text);color:var(--white);border:none;}
+.result-note{font-size:11px;color:var(--hint);line-height:1.7;}
+.ad-banner{background:var(--bg);border:1px dashed var(--border);color:var(--hint);font-size:11px;text-align:center;padding:10px;max-width:728px;margin:12px auto;}
+footer{background:var(--white);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--hint);}
+@keyframes bad-flash{0%{background:var(--white)}30%{background:#FCEBEB}100%{background:var(--white)}}
+.bad-flash{animation:bad-flash .5s ease;}
+@keyframes pov-flash{0%{background:var(--white)}30%{background:#EAF3DE}100%{background:var(--white)}}
+.pov-flash{animation:pov-flash .6s ease;}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade-in{animation:fade-in .3s ease;}
+@media(max-width:480px){.title-main{font-size:24px;}.title-wrap{padding:40px 20px 36px;}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="#">圧ゲー.jp</a>
+  <a class="nav-back" href="#">← ゲーム一覧</a>
+</nav>
+
+<!-- TITLE -->
+<div class="screen on" id="s-title">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="title-wrap">
+    <p class="title-eyebrow">圧ゲー.jp presents</p>
+    <h1 class="title-main">気を遣っても<span class="title-accent">怒られる</span>。<br>遣わなくても<span class="title-accent">怒られる</span>。</h1>
+    <p class="title-sub">全8問。どちら側でも詰む。</p>
+    <p class="title-sub2">食事会にヴィーガンがいる。<br>肉を頼むのも・頼まないのも・気を遣うのも・何も言わないのも、<br>全部誰かの地雷だ。</p>
+    <div class="title-meta">
+      <span class="tmeta">クイズ</span>
+      <span class="tmeta">全8問</span>
+      <span class="tmeta">視点チェンジあり</span>
+      <span class="tmeta">無料</span>
+    </div>
+    <button class="title-btn" onclick="startGame()">▶ はじめる</button>
+    <p class="title-note">このゲームは「食の選択と価値観の衝突」をテーマにした皮肉系クイズです。<br>途中で視点が切り替わります。どちら側でも詰む。</p>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="game-wrap">
+    <div class="status-bar">
+      <span class="q-label" id="q-label">Q1 / 8</span>
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <span class="score-label" id="score-label">正解 0</span>
+    </div>
+    <div class="pov-banner" id="pov-banner"></div>
+    <div class="scene-card fade-in" id="scene-card">
+      <div>
+        <span class="place-badge" id="place-badge"></span>
+        <span class="pov-badge" id="pov-badge"></span>
+      </div>
+      <div class="scene-title" id="scene-title"></div>
+      <div class="situation" id="situation"></div>
+      <div class="speech" id="speech"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="fb-moya" id="fb-moya"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="result-wrap">
+    <div class="result-icon" id="r-icon"></div>
+    <p class="result-score-label">8問中</p>
+    <p class="result-score" id="r-score"></p>
+    <p class="result-title" id="r-title"></p>
+    <p class="result-comment" id="r-comment"></p>
+    <p class="result-twist" id="r-twist"></p>
+    <div class="result-btns">
+      <button class="btn-share" onclick="share()">X でシェア</button>
+      <button class="btn-retry" onclick="retry()">もう一度</button>
+    </div>
+    <p class="result-note">全問正解してもモヤる。それがこのゲームの正体だ。</p>
+  </div>
+</div>
+
+<footer>© 2025 圧ゲー.jp</footer>
+
+<script>
+var SCENES=[
+  {
+    place:'🍽️ 食事会 / 幹事',pov:'meat',povLabel:'🥩 肉食側視点',
+    title:'お店を選ぶ係になった',
+    situ:'職場の食事会。メンバー6人のうち1人がヴィーガン。幹事があなたに店選びを頼んできた。',
+    speech:'「どこかいいお店、知ってる？」',
+    choices:[
+      {t:'safe',x:'ヴィーガンメニューもある普通のレストランを調べて提案する'},
+      {t:'out', x:'「焼肉にしましょう！何でも食べられますよね？」と確認せずに決める'},
+      {t:'trap',x:'「せっかくだからヴィーガンレストランにしましょう！」と全員をヴィーガン店に連れて行く'},
+    ],
+    fb:{
+      safe:'✔ 全員が選べる店を探した。ただし「ヴィーガン向けメニューが少ない」と後で言われる可能性は残る。',
+      out: '✕ 確認しなかった。食の制限を無視した。',
+      trap:'⚠ 1人のために全員の選択肢を制限した。「気を遣いすぎ」と言われることも、当のヴィーガンに「申し訳ない」と思わせることもある。',
+    },
+    moya:'配慮しようとするほど、誰かにとっての「普通」が犠牲になる。',
+  },
+  {
+    place:'🍽️ レストラン / 注文',pov:'meat',povLabel:'🥩 肉食側視点',
+    title:'ステーキが食べたい',
+    situ:'席についた。メニューを見るとステーキが食べたい。ヴィーガンの同僚・山田さんの隣に座っている。',
+    speech:'（店員が注文を取りに来た）',
+    choices:[
+      {t:'safe',x:'普通にステーキを注文する'},
+      {t:'out', x:'「ヴィーガンって栄養大丈夫なんですか？」と聞きながらステーキを注文する'},
+      {t:'trap',x:'「私も植物性にします！」と山田さんに合わせる'},
+    ],
+    fb:{
+      safe:'✔ 自分の自由を行使した。ただし「目の前で注文するの…」という空気が流れることがある。',
+      out: '✕ 肉を食べながら相手の食を批判している。最悪の組み合わせ。',
+      trap:'⚠ 「無理しなくていいのに」「パフォーマンスっぽい」と思われることがある。同情からの同調は相手を複雑にさせる。',
+    },
+    moya:'食べることも・合わせることも・何かを言うことも、全部見られている。',
+  },
+  {
+    place:'🍽️ テーブル / 料理が来た',pov:'meat',povLabel:'🥩 肉食側視点',
+    title:'シェアしようとした',
+    situ:'前菜が運ばれてきた。みんなでシェアしようという雰囲気に。山田さんに何と言う？',
+    speech:'（料理が並んでいる）',
+    choices:[
+      {t:'safe',x:'特に何も言わず、ヴィーガン対応のものだけ山田さんの近くに置く'},
+      {t:'out', x:'「山田さん、これ食べられます？」と全員の前で確認する'},
+      {t:'trap',x:'「みんな、山田さんが食べられるものだけシェアしましょう！」とテーブル全体に提案する'},
+    ],
+    fb:{
+      safe:'✔ さりげなく配慮した。ただし「気づいてくれてるのに何も言わないのも変」と感じる人もいる。',
+      out: '✕ 全員の前で「食べられないもの」に注目させた。本人が目立ちたくない場合、追い打ちになる。',
+      trap:'⚠ テーブル全体の食事を1人に合わせた。「そこまでしなくていい」という空気と、「ありがとう」という気持ちが同時に発生する。',
+    },
+    moya:'配慮は見えないほど洗練されているべきか、見えるほど誠実であるべきか。',
+  },
+  {
+    place:'🍽️ テーブル / 会話中',pov:'meat',povLabel:'🥩 肉食側視点',
+    title:'ヴィーガンになった理由を聞きたい',
+    situ:'食事が進んで会話が弾んできた。山田さんがヴィーガンになった経緯が気になった。',
+    speech:'（山田さんが楽しそうに話している）',
+    choices:[
+      {t:'safe',x:'聞かない。会話の流れに任せる'},
+      {t:'out', x:'「やっぱり動物が可哀想だから？」と決めつけて聞く'},
+      {t:'trap',x:'「ヴィーガンってどうして始めたんですか？興味あって」と聞く'},
+    ],
+    fb:{
+      safe:'✔ 相手が話したければ話す。それを待った。ただし「興味がない人」と思われる可能性もある。',
+      out: '✕ 理由を決めつけた上で聞いた。「環境のため」かもしれないし「アレルギー」かもしれない。',
+      trap:'⚠ 悪くない。でも食事のたびに理由を説明させられることに疲れているヴィーガンもいる。',
+    },
+    moya:'善意の質問が、何百回目かの同じ質問であることがある。',
+  },
+  {
+    place:'🍽️ テーブル / 食事中',pov:'vegan',povLabel:'🌱 ヴィーガン側視点',
+    title:'視点チェンジ：みんなが焼肉を食べている',
+    situ:'あなたはヴィーガン。食事会に来たが、テーブルには肉料理ばかり。自分の皿には野菜だけ。みんなが楽しそうに食べている。',
+    speech:'（沈黙。みんなはこちらを気にしている様子）',
+    choices:[
+      {t:'safe',x:'笑顔でドリンクを飲みながら会話に参加する'},
+      {t:'out', x:'「動物がどれだけ苦しんでるか知ってます？」と話し始める'},
+      {t:'trap',x:'「私のことは気にしないで！みんな好きなもの食べて！」と明るく言う'},
+    ],
+    fb:{
+      safe:'✔ 空気を壊さなかった。ただし「無理してる」と思われることがある。内心どうかは誰も知らない。',
+      out: '✕ 食事中に始めてしまった。全員が黙った。',
+      trap:'⚠ 「気にしないで」と言われると余計に気になる。全員が「気にしないようにしよう」と意識し始めた。',
+    },
+    moya:'「気にしないで」は「気にして」と同じ効果を持つことがある。',
+  },
+  {
+    place:'🍽️ テーブル / デザート',pov:'vegan',povLabel:'🌱 ヴィーガン側視点',
+    title:'デザートを勧められた',
+    situ:'デザートタイム。隣の人が「これ美味しいよ、食べて！」とケーキを勧めてきた。乳製品が入っている。',
+    speech:'「一口どうぞ！」',
+    choices:[
+      {t:'safe',x:'「ありがとう、でもヴィーガンだから乳製品が入ってると食べられなくて」と説明する'},
+      {t:'out', x:'何も言わずに受け取って、食べるふりをする'},
+      {t:'trap',x:'「気持ちだけもらいます！お気遣いありがとうございます」と丁寧に断る'},
+    ],
+    fb:{
+      safe:'✔ 正直に説明した。ただし「また断られた」と相手が気まずさを感じることがある。',
+      out: '✕ 自分の信念を曲げた。食べるふりをしながら何を感じているか。',
+      trap:'⚠ 丁寧すぎる断り方が「気を遣わせてしまった」と相手に思わせることがある。',
+    },
+    moya:'断るだけで謝罪が必要な空気になる。食の選択が「迷惑」として扱われる構造がある。',
+  },
+  {
+    place:'🚗 帰り道 / 二人きり',pov:'vegan',povLabel:'🌱 ヴィーガン側視点',
+    title:'「なんでヴィーガンなの？」と聞かれた',
+    situ:'帰り道、気の置けない同僚と二人になった。「正直、なんでヴィーガンにしたの？」と聞かれた。',
+    speech:'「別に責めてるわけじゃないんだけど、純粋に気になって」',
+    choices:[
+      {t:'safe',x:'「環境問題とか動物福祉とか、いろいろ考えてて」と答える'},
+      {t:'out', x:'「肉を食べる人の感覚が正直理解できなくて」と本音を言う'},
+      {t:'trap',x:'「なんとなく体に合わなくて、それだけです」と話を小さくする'},
+    ],
+    fb:{
+      safe:'✔ 自分の考えを話した。ただし「説教くさい」と受け取られるリスクは常にある。',
+      out: '✕ 本音だが、相手の生き方を否定した。帰り道が気まずくなった。',
+      trap:'⚠ 本当の理由を隠した。「なんとなく」と言うことで、自分の信念を矮小化した。',
+    },
+    moya:'信念を話せば説教になり、隠せば自分を裏切る。どこまで本音を言えばいいのか。',
+  },
+  {
+    place:'🏠 翌日 / 社内チャット',pov:'meat',povLabel:'🥩 肉食側視点',
+    title:'「昨日はごめんね」と言うべきか',
+    situ:'翌日、山田さんに昨日の食事会で食べるものが少なかったことが気になっている。何かメッセージを送るか。',
+    speech:'（チャット画面を開いている）',
+    choices:[
+      {t:'safe',x:'何も送らない。山田さんが気にしていなければ余計なことになる'},
+      {t:'out', x:'「昨日、食べるもの少なくてごめんね！」と謝罪を送る'},
+      {t:'trap',x:'「次は山田さんが食べやすいお店にしようね！」と気遣いを送る'},
+    ],
+    fb:{
+      safe:'✔ 静かな判断。でも「気にしてくれてないんだ」と思われる可能性もゼロではない。',
+      out: '✕ 謝罪することで「あなたのせいで気を遣った」というメッセージを送っている。山田さんは謝ってほしかったわけではないかもしれない。',
+      trap:'⚠ 「次は山田さんに合わせる」という宣言は、また山田さんがみんなの選択肢を制限する立場になることを予告している。',
+    },
+    moya:'何もしないことも・謝ることも・気遣うことも、全部が次の地雷の準備になっている。',
+  },
+];
+
+var RESULTS=[
+  {min:7,icon:'🍽️',title:'テーブルの平和主義者',
+   comment:'ほぼ全問正解した。誰も傷つけなかった。でも全員が少し疲れた食事会だった。',
+   twist:'「平和な食事会」の裏で、誰かが何かを我慢していた可能性がある。'},
+  {min:5,icon:'🙂',title:'気を遣える人（つもり）',
+   comment:'「気にしてる」のは伝わった。でも気遣いが地雷になることがある。',
+   twist:'配慮の押しつけは、配慮しないことより疲れることがある。'},
+  {min:3,icon:'😅',title:'善意で踏む人',
+   comment:'悪意はなかった。でも善意の地雷は、悪意の地雷と同じくらい痛い。',
+   twist:'「そのつもりじゃなかった」は、もう聞き飽きている人がいる。'},
+  {min:0,icon:'💥',title:'テーブル分裂要因',
+   comment:'ほぼ全部踏んだ。でも大丈夫。食事会はなんとか終わった。次の招待が来るかどうかは別の話だが。',
+   twist:'「また誘いたい」と思われているかどうかは、誰も言わない。'},
+];
+
+var cur=0,score=0,answered=false,shuffled=[],prevPov='';
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function startGame(){cur=0;score=0;answered=false;prevPov='';show('s-game');renderQ();}
+
+function renderQ(){
+  var s=SCENES[cur];
+  answered=false;
+
+  document.getElementById('q-label').textContent='Q'+(cur+1)+' / 8';
+  document.getElementById('prog').style.width=(cur/8*100)+'%';
+  document.getElementById('score-label').textContent='正解 '+score;
+  document.getElementById('place-badge').textContent=s.place;
+
+  var povBadge=document.getElementById('pov-badge');
+  povBadge.textContent=s.povLabel;
+  povBadge.className='pov-badge pov-'+s.pov;
+
+  // 視点チェンジ通知
+  var banner=document.getElementById('pov-banner');
+  if(prevPov && prevPov!==s.pov){
+    banner.textContent='⚡ 視点チェンジ：'+s.povLabel+'に切り替わります';
+    banner.style.display='block';
+    var card=document.getElementById('scene-card');
+    card.classList.add('pov-flash');
+    setTimeout(function(){card.classList.remove('pov-flash');},600);
+  } else {
+    banner.style.display='none';
+  }
+  prevPov=s.pov;
+
+  document.getElementById('scene-title').textContent=s.title;
+  document.getElementById('situation').textContent=s.situ;
+  document.getElementById('speech').textContent=s.speech;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('fb-moya').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+
+  var grid=document.getElementById('choices');
+  grid.innerHTML='';
+  shuffled=shuffle([0,1,2]);
+  shuffled.forEach(function(origIdx,pos){
+    var c=s.choices[origIdx];
+    var btn=document.createElement('button');
+    btn.className='ch-btn';
+    btn.innerHTML='<span class="ch-alph">'+['A','B','C'][pos]+'</span>'+c.x;
+    (function(oi){btn.onclick=function(){pick(oi);};})(origIdx);
+    grid.appendChild(btn);
+  });
+
+  var card=document.getElementById('scene-card');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function pick(origIdx){
+  if(answered)return;
+  answered=true;
+  var s=SCENES[cur];
+  var c=s.choices[origIdx];
+  if(c.t==='safe')score++;
+
+  document.querySelectorAll('.ch-btn').forEach(function(b,pos){
+    b.disabled=true;
+    if(shuffled[pos]===origIdx)b.classList.add('r-'+c.t);
+  });
+
+  var fb=document.getElementById('feedback');
+  fb.textContent=s.fb[c.t];
+  fb.className='feedback fb-'+c.t;
+  fb.style.display='block';
+
+  var moya=document.getElementById('fb-moya');
+  moya.innerHTML='<strong>このシーンのモヤり：</strong>'+s.moya;
+  moya.style.display='block';
+
+  if(c.t!=='safe'){
+    var card=document.getElementById('scene-card');
+    card.classList.add('bad-flash');
+    setTimeout(function(){card.classList.remove('bad-flash');},500);
+  }
+
+  document.getElementById('score-label').textContent='正解 '+score;
+  var nb=document.getElementById('next-btn');
+  nb.style.display='block';
+  nb.textContent=cur<7?'次へ →':'結果を見る';
+}
+
+function nextQ(){cur++;if(cur>=8){showResult();return;}renderQ();}
+
+function showResult(){
+  document.getElementById('prog').style.width='100%';
+  show('s-result');
+  var r=RESULTS[RESULTS.length-1];
+  for(var i=0;i<RESULTS.length;i++){if(score>=RESULTS[i].min){r=RESULTS[i];break;}}
+  document.getElementById('r-icon').textContent=r.icon;
+  document.getElementById('r-score').textContent=score+'問正解';
+  document.getElementById('r-title').textContent=r.title;
+  document.getElementById('r-comment').textContent=r.comment;
+  document.getElementById('r-twist').textContent='→ '+r.twist;
+}
+
+function retry(){cur=0;score=0;answered=false;prevPov='';show('s-game');renderQ();}
+
+function share(){
+  var r=RESULTS[RESULTS.length-1];
+  for(var i=0;i<RESULTS.length;i++){if(score>=RESULTS[i].min){r=RESULTS[i];break;}}
+  var txt='「気を遣っても怒られる。遣わなくても怒られる。」8問中'+score+'問正解。称号：'+r.title+'。\n食事会にヴィーガンがいる。どちら側でも詰む。\nhttps://100makeniki.github.io/atsu-game-/ #圧ゲーjp #気を遣っても怒られる';
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt));
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

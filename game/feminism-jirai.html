@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>褒めたらアウト。| 圧ゲー.jp</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+:root{
+  --bg:#F7F6F3;--white:#fff;--border:#E0DED8;
+  --text:#1a1a18;--sub:#666460;--hint:#999790;
+  --pink-light:#FBEAF0;--pink-dark:#72243E;--pink-mid:#993556;
+  --teal-light:#E1F5EE;--teal-dark:#085041;--teal-mid:#0F6E56;
+  --red-light:#FCEBEB;--red-dark:#791F1F;--red-mid:#A32D2D;
+  --purple-light:#EEEDFE;--purple-dark:#26215C;--purple-mid:#3C3489;
+  --amber-light:#FAEEDA;--amber-dark:#412402;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;height:48px;display:flex;align-items:center;gap:16px;}
+.nav-logo{font-size:14px;font-weight:700;color:var(--text);text-decoration:none;}
+.nav-back{font-size:13px;color:var(--sub);text-decoration:none;}
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* TITLE */
+#s-title{background:var(--white);}
+.title-wrap{max-width:520px;margin:0 auto;padding:60px 24px 48px;text-align:center;}
+.title-eyebrow{font-size:11px;letter-spacing:.12em;color:var(--hint);margin-bottom:28px;}
+.title-main{font-size:clamp(28px,7vw,46px);font-weight:700;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em;}
+.title-accent{color:#D4537E;}
+.title-sub{font-size:13px;color:var(--sub);margin-bottom:6px;line-height:1.7;}
+.title-sub2{font-size:12px;color:var(--hint);margin-bottom:36px;line-height:1.7;}
+.title-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.tmeta{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--sub);}
+.title-btn{background:var(--text);color:var(--white);border:none;border-radius:10px;padding:15px 40px;font-size:15px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:block;margin:0 auto 16px;transition:opacity .15s;}
+.title-btn:hover{opacity:.85;}
+.title-note{font-size:11px;color:var(--hint);line-height:1.7;}
+
+/* GAME */
+.game-wrap{max-width:600px;margin:0 auto;padding:16px 16px 60px;}
+.status-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.q-label{font-size:12px;color:var(--sub);white-space:nowrap;}
+.progress-track{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:#D4537E;border-radius:3px;transition:width .4s ease;}
+.score-label{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;}
+.scene-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;}
+.place-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--pink-light);color:var(--pink-dark);display:inline-block;margin-bottom:10px;}
+.scene-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.situation{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px;}
+.speech{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:16px;padding-left:14px;border-left:2px solid var(--border);}
+.choices{display:flex;flex-direction:column;gap:8px;}
+.ch-btn{width:100%;text-align:left;border-radius:10px;padding:12px 14px;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text);transition:background .12s,transform .1s;line-height:1.5;}
+.ch-btn:hover:not(:disabled){background:var(--bg);transform:translateY(-1px);}
+.ch-btn:disabled{opacity:.65;cursor:default;}
+.ch-alph{font-size:10px;font-weight:500;color:var(--hint);display:block;margin-bottom:2px;}
+.ch-btn.r-safe{background:var(--teal-light);border-color:#5DCAA5;color:var(--teal-dark);}
+.ch-btn.r-out{background:var(--red-light);border-color:#F09595;color:var(--red-dark);}
+.ch-btn.r-trap{background:var(--purple-light);border-color:#AFA9EC;color:var(--purple-dark);}
+.feedback{display:none;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.65;margin-top:10px;}
+.fb-safe{background:var(--teal-light);color:var(--teal-mid);}
+.fb-out{background:var(--red-light);color:var(--red-mid);}
+.fb-trap{background:var(--purple-light);color:var(--purple-mid);}
+.fb-moya{background:var(--bg);color:var(--sub);border-left:3px solid #D4537E;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;margin-top:8px;display:none;line-height:1.65;}
+.fb-moya strong{color:var(--text);}
+.next-btn{display:none;width:100%;padding:13px;border-radius:10px;background:var(--text);color:var(--white);font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;margin-top:10px;}
+.next-btn:hover{opacity:.85;}
+
+/* RESULT */
+#s-result{background:var(--white);}
+.result-wrap{max-width:520px;margin:0 auto;padding:48px 24px;text-align:center;}
+.result-icon{font-size:52px;margin-bottom:16px;}
+.result-score-label{font-size:13px;color:var(--hint);margin-bottom:4px;}
+.result-score{font-size:36px;font-weight:700;margin-bottom:16px;}
+.result-title{font-size:20px;font-weight:700;margin-bottom:10px;}
+.result-comment{font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:8px;max-width:420px;margin-left:auto;margin-right:auto;}
+.result-twist{font-size:13px;color:var(--hint);font-style:italic;margin-bottom:32px;line-height:1.7;}
+.result-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.btn-share{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:#1DA1F2;color:var(--white);border:none;}
+.btn-retry{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--text);color:var(--white);border:none;}
+.result-note{font-size:11px;color:var(--hint);line-height:1.7;}
+.ad-banner{background:var(--bg);border:1px dashed var(--border);color:var(--hint);font-size:11px;text-align:center;padding:10px;max-width:728px;margin:12px auto;}
+footer{background:var(--white);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--hint);}
+@keyframes bad-flash{0%{background:var(--white)}30%{background:#FBEAF0}100%{background:var(--white)}}
+.bad-flash{animation:bad-flash .5s ease;}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade-in{animation:fade-in .3s ease;}
+@media(max-width:480px){.title-main{font-size:28px;}.title-wrap{padding:40px 20px 36px;}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="#">圧ゲー.jp</a>
+  <a class="nav-back" href="#">← ゲーム一覧</a>
+</nav>
+
+<!-- TITLE -->
+<div class="screen on" id="s-title">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="title-wrap">
+    <p class="title-eyebrow">圧ゲー.jp presents</p>
+    <h1 class="title-main">褒めたら<span class="title-accent">アウト</span>。<br>褒めなくても<span class="title-accent">アウト</span>。</h1>
+    <p class="title-sub">全12問。正解してもモヤる。</p>
+    <p class="title-sub2">「わかってるつもり」が一番危ない。<br>あなたの善意は、誰かの地雷かもしれない。</p>
+    <div class="title-meta">
+      <span class="tmeta">クイズ</span>
+      <span class="tmeta">全12問</span>
+      <span class="tmeta">フェミニズム地雷</span>
+      <span class="tmeta">無料</span>
+    </div>
+    <button class="title-btn" onclick="startGame()">▶ はじめる</button>
+    <p class="title-note">このゲームは「無意識の性差別」をテーマにした皮肉系クイズです。<br>正解を知ることと、傷つけないことは別物かもしれない。</p>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="game-wrap">
+    <div class="status-bar">
+      <span class="q-label" id="q-label">Q1 / 12</span>
+      <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <span class="score-label" id="score-label">正解 0</span>
+    </div>
+    <div class="scene-card fade-in" id="scene-card">
+      <span class="place-badge" id="place-badge"></span>
+      <div class="scene-title" id="scene-title"></div>
+      <div class="situation" id="situation"></div>
+      <div class="speech" id="speech"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="fb-moya" id="fb-moya"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="ad-banner">広告 / AdSense Banner (728×90)</div>
+  <div class="result-wrap">
+    <div class="result-icon" id="r-icon"></div>
+    <p class="result-score-label">12問中</p>
+    <p class="result-score" id="r-score"></p>
+    <p class="result-title" id="r-title"></p>
+    <p class="result-comment" id="r-comment"></p>
+    <p class="result-twist" id="r-twist"></p>
+    <div class="result-btns">
+      <button class="btn-share" onclick="share()">X でシェア</button>
+      <button class="btn-retry" onclick="retry()">もう一度</button>
+    </div>
+    <p class="result-note">全問正解してもモヤる。それがこのゲームの正体だ。</p>
+  </div>
+</div>
+
+<footer>© 2025 圧ゲー.jp</footer>
+
+<script>
+var SCENES=[
+  {
+    place:'🏢 職場 / 会議後',title:'女性部下のプレゼンを褒める',
+    situ:'女性の部下・田中さんが大事なプレゼンを成功させた。上司として何か声をかけたい。',
+    speech:'（田中さんが資料を片付けている）',
+    choices:[
+      {t:'safe',x:'「素晴らしいプレゼンでした。特に数字の見せ方が良かった」と具体的に伝える'},
+      {t:'out', x:'「女性らしい細やかな視点でしたね」と褒める'},
+      {t:'trap',x:'「お子さんいるのに、本当によく頑張りましたね」と労う'},
+    ],
+    fb:{
+      safe:'✔ 仕事の内容を評価した。ただし感情がなさすぎて「冷たい」と取られることもある。',
+      out: '✕ 性別で括った。「女性らしい」は褒め言葉ではない。',
+      trap:'⚠ 「子どもがいると仕事に支障がある」という前提が一文に全部入っている。',
+    },
+    moya:'褒めようとするほど地雷に近づく。仕事の話だけしていれば安全、というわけでもない。',
+  },
+  {
+    place:'🍻 合コン / 初対面',title:'最初の質問',
+    situ:'合コンで初対面の女性と話している。何を聞くか。',
+    speech:'（沈黙が訪れた）',
+    choices:[
+      {t:'safe',x:'「趣味は何ですか？」と聞く'},
+      {t:'out', x:'「料理は得意ですか？」と聞く'},
+      {t:'trap',x:'「仕事、バリバリやってるんですか？」と聞く'},
+    ],
+    fb:{
+      safe:'✔ 無難。でも「つまらない人」と思われるリスクがある。正解は面白くない。',
+      out: '✕ 女性＝料理という固定観念の塊。2025年にまだこれ。',
+      trap:'⚠ 「バリキャリ女性」像を押し付けている。働く女性＝すごいという別の型にはめた。',
+    },
+    moya:'型にはめない質問をしようとすると、別の型にはめることになる。',
+  },
+  {
+    place:'🏢 職場 / 月曜朝',title:'育休から復帰した同僚への一言',
+    situ:'1年間育休を取っていた同僚・佐藤さんが今日から復帰した。何と声をかける？',
+    speech:'「おはようございます」と挨拶してきた。',
+    choices:[
+      {t:'safe',x:'「おかえりなさい。また一緒に仕事できて嬉しいです」と言う'},
+      {t:'out', x:'「大変だったでしょう。育児と仕事、両立大変ですよね」と言う'},
+      {t:'trap',x:'「育休中も大変でしたよね。ゆっくりペースで戻ってきてください」と言う'},
+    ],
+    fb:{
+      safe:'✔ 仕事仲間として迎えた。ただし「育休中のことを聞いてくれない」と感じる人もいる。',
+      out: '✕ 「育児＝大変」を決めつけ、復帰初日から「両立」という重荷を乗せた。',
+      trap:'⚠ 「ゆっくりでいい」は配慮のつもりが「戦力外扱い」に聞こえることがある。',
+    },
+    moya:'何を言っても「決めつけ」になりうる。復帰した人が聞きたい言葉は本人しか知らない。',
+  },
+  {
+    place:'🍽️ デート / 会計',title:'奢る・割り勘問題',
+    situ:'初デートの会計。どうする？',
+    speech:'（伝票が来た）',
+    choices:[
+      {t:'safe',x:'「今日は出させてください」と言い、相手の反応を見て判断する'},
+      {t:'out', x:'黙って全額払う'},
+      {t:'trap',x:'「割り勘でいいですか？」と聞く'},
+    ],
+    fb:{
+      safe:'✔ 意思を示しつつ相手に委ねた。でも「なんで私が決めるの」と思う人もいる。',
+      out: '✕ 「女性は払えない・払わなくていい」という前提で動いた。同意を取っていない。',
+      trap:'⚠ 「気が利かない」と言われることがある。でも割り勘を求める人もいる。どちらが正解かは相手次第。',
+    },
+    moya:'会計ひとつで「古い」とも「気が利かない」とも言われる。正解は相手の中にしかない。',
+  },
+  {
+    place:'📱 SNS / 深夜',title:'フェミニズム投稿へのリアクション',
+    situ:'フォロワーがフェミニズムに関する投稿をした。どうリアクションする？',
+    speech:'「女性が声を上げることを、もっと社会は受け入れるべき」',
+    choices:[
+      {t:'safe',x:'いいねだけする'},
+      {t:'out', x:'「でも男性も大変ですよね」とリプする'},
+      {t:'trap',x:'「わかります！私も声を上げていきたいです」とリプする（男性の場合）'},
+    ],
+    fb:{
+      safe:'✔ 表明した。でも「いいねだけなの？」と言われる場合がある。',
+      out: '✕ 話題をすり替えた。これは古典的すぎるアウト。',
+      trap:'⚠ 当事者でないのに「共感アピール」と取られることがある。善意の乗っかりは地雷になる。',
+    },
+    moya:'黙っていても「無関心」、発言しても「出しゃばり」になりうる。どこに立てばいいのか。',
+  },
+  {
+    place:'🏢 職場 / 廊下',title:'「女性らしい気配り」と言いそうな瞬間',
+    situ:'会議の準備で女性の同僚・林さんが率先して資料を揃えてくれた。何と言う？',
+    speech:'（林さんが手際よく準備している）',
+    choices:[
+      {t:'safe',x:'「ありがとうございます、助かります」と言う'},
+      {t:'out', x:'「さすが、女性ならではの気配りですね」と言う'},
+      {t:'trap',x:'「林さんっていつも気が利きますよね！」と明るく言う'},
+    ],
+    fb:{
+      safe:'✔ 行動への感謝を伝えた。シンプルが最強。',
+      out: '✕ 気配りを性別に紐づけた。「女性だから」という前置きが全部台無しにする。',
+      trap:'⚠ 一見セーフだが、林さんが毎回気配り役を期待されていると感じている場合、追い打ちになる。',
+    },
+    moya:'褒めているつもりが役割の固定化を強化していることがある。',
+  },
+  {
+    place:'🏠 家庭 / 夜',title:'家事分担の会話',
+    situ:'同棲中のパートナーに家事分担について話し合いたいと言われた。',
+    speech:'「家事、もう少し一緒にやってほしい」',
+    choices:[
+      {t:'safe',x:'「そうだね、何をどう分担するか一緒に決めよう」と答える'},
+      {t:'out', x:'「俺も手伝ってるじゃん」と答える'},
+      {t:'trap',x:'「わかった、もっと積極的に手伝うようにする」と答える'},
+    ],
+    fb:{
+      safe:'✔ 対等に話し合う姿勢を示した。ただし「決めるだけで終わる」パターンには注意。',
+      out: '✕ 「手伝う」という発言が既に地雷。家事はあなたの仕事でもある。',
+      trap:'⚠ 「手伝う」という言葉を使った。家事はパートナーのものを「手伝う」のではない。',
+    },
+    moya:'「手伝う」という言葉に家事の主体が誰かという前提が滲み出ている。',
+  },
+  {
+    place:'🏢 職場 / 会議室',title:'女性上司への態度',
+    situ:'新しい上司・山田部長（女性）が着任した。初めての会議で意見が食い違った。',
+    speech:'「この方針で進めます」と山田部長が言った。あなたは別の意見がある。',
+    choices:[
+      {t:'safe',x:'「一点確認させてください」と発言して自分の意見を述べる'},
+      {t:'out', x:'その場では黙って、後で男性の先輩に「どう思います？」と相談する'},
+      {t:'trap',x:'「山田さん、その考え方、素晴らしいですね！ただ…」と褒めてから反論する'},
+    ],
+    fb:{
+      safe:'✔ 上司に対して普通に意見を言った。これが正解。ただし「生意気」と取られるリスクも同じだけある。',
+      out: '✕ 女性上司の判断を男性に確認しに行った。無意識の序列がある。',
+      trap:'⚠ 女性だから最初に褒めた。男性上司に同じことをするか？',
+    },
+    moya:'女性上司への接し方に、普段気づかない前提が現れる。',
+  },
+  {
+    place:'📱 SNS / 夜',title:'「#MeToo」投稿を見た',
+    situ:'知人女性がSNSに被害体験を投稿した。どうする？',
+    speech:'「ずっと言えなかったけど、あの時のことを話します」',
+    choices:[
+      {t:'safe',x:'いいねをして、必要であればDMで「話してくれてありがとう」と伝える'},
+      {t:'out', x:'「本当にそんなことがあったの？」とリプする'},
+      {t:'trap',x:'「勇気ある投稿！シェアしていいですか？」とリプする'},
+    ],
+    fb:{
+      safe:'✔ 本人の意思を尊重した行動。静かなサポートが正解に近い。',
+      out: '✕ 被害を疑った。これ以上のアウトはない。',
+      trap:'⚠ 善意だが「私の話をコンテンツにしないで」と感じる人がいる。シェアは本人が決めること。',
+    },
+    moya:'善意の拡散が当事者の意図を無視することがある。見守ることも支援のひとつ。',
+  },
+  {
+    place:'☕ カフェ / 週末',title:'専業主婦を選んだ友人への言葉',
+    situ:'大学の友人・美咲が「仕事を辞めて専業主婦になることにした」と話してくれた。',
+    speech:'「先月で退職したんだ。子育てに集中したくて」',
+    choices:[
+      {t:'safe',x:'「そっか、自分で決めたんだね」と受け取る'},
+      {t:'out', x:'「もったいないね、せっかくキャリアがあるのに」と言う'},
+      {t:'trap',x:'「いいね！やっぱり子育てって大事だよね」と賛同する'},
+    ],
+    fb:{
+      safe:'✔ 本人の選択を尊重した。これだけでいい。',
+      out: '✕ 働くことを前提にして「もったいない」と言った。専業主婦という選択を下に見ている。',
+      trap:'⚠ 賛同しているようで「子育て＝女性の仕事」という前提を強化している。',
+    },
+    moya:'働くことを褒めても、専業主婦を褒めても、どちらかの選択を標準にしている。',
+  },
+  {
+    place:'🏢 会議室 / 採用面接',title:'女性候補者を評価する',
+    situ:'採用面接。候補者の鈴木さん（女性）は能力は高いが、近い将来結婚・出産の可能性もある。評価をどうする？',
+    speech:'（面接が終わり、評価シートを書いている）',
+    choices:[
+      {t:'safe',x:'能力・経験・志望動機だけで評価する'},
+      {t:'out', x:'「将来のライフイベントも考慮して」と評価に含める'},
+      {t:'trap',x:'「女性活躍推進の観点からも積極的に採用すべき」と評価に書く'},
+    ],
+    fb:{
+      safe:'✔ 採用基準を統一した。これが法的にも正しい。でも「能力だけで見れているか」という問いは残る。',
+      out: '✕ 性別に基づく差別。違法でもある。',
+      trap:'⚠ 「女性だから採用」も性別による区別。本人は能力で評価されたかった可能性がある。',
+    },
+    moya:'「女性を優遇する」も「不利に扱う」も、どちらも性別で判断している点では同じだ。',
+  },
+  {
+    place:'🍻 飲み会 / 深夜',title:'「フェミニストですか？」と聞かれた',
+    situ:'飲み会で突然「あなたってフェミニストですか？」と聞かれた。',
+    speech:'「ねえ、正直に教えてほしいんだけど」',
+    choices:[
+      {t:'safe',x:'「男女が対等に扱われるべきという意味では、そうだと思います」と答える'},
+      {t:'out', x:'「いや、そういうの苦手で…」と濁す'},
+      {t:'trap',x:'「もちろん！フェミニストじゃない人の気が知れない」と言う'},
+    ],
+    fb:{
+      safe:'✔ 自分の立場を丁寧に説明した。ただし「それって本当にフェミニズムを理解してる？」という問いは残る。',
+      out: '✕ 「フェミニスト」というラベルを怖がった。怖がる理由はどこから来ているのか。',
+      trap:'⚠ 同意しない人を切り捨てた。フェミニズムの議論は「敵か味方か」ではないはずだ。',
+    },
+    moya:'「フェミニスト」というラベルへの反応そのものが、そのゲームの最後の問いだ。',
+  },
+];
+
+var RESULTS=[
+  {min:11,icon:'🏅',title:'意識高め系（自称）',
+   comment:'ほぼ全問正解した。でも「正解を知っている人」と「傷つけない人」は別物だ。',
+   twist:'次にあなたが地雷を踏む瞬間は、「正解を知っている」ときかもしれない。'},
+  {min:9,icon:'🙂',title:'気にしてる人',
+   comment:'「気にしてる」のは伝わる。でも気にしていることを相手は知らない。',
+   twist:'善意は相手に届かなければ、存在しないのと同じだ。'},
+  {min:6,icon:'😅',title:'惜しい人',
+   comment:'半分は正しかった。残りは「そのつもりじゃなかった」と言いながら踏んだ。',
+   twist:'「そのつもりじゃなかった」は相手の傷を消さない。'},
+  {min:3,icon:'😬',title:'無自覚な人',
+   comment:'悪意はなかった。本当に。でも悪意がないことと、傷つけないことは別の話だ。',
+   twist:'あなたの周りの女性は、今日も何も言わずにいる。'},
+  {min:0,icon:'💀',title:'褒めたらアウト（本人は褒めたつもり）',
+   comment:'ほぼ全部踏んだ。でも大丈夫。あなたのことを「差別主義者」と呼ぶ人はいない。みんな笑って流してくれる。',
+   twist:'笑って流してくれている間も、地雷は埋まり続けている。'},
+];
+
+var cur=0,score=0,answered=false,shuffled=[];
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function startGame(){cur=0;score=0;answered=false;show('s-game');renderQ();}
+
+function renderQ(){
+  var s=SCENES[cur];
+  answered=false;
+  document.getElementById('q-label').textContent='Q'+(cur+1)+' / 12';
+  document.getElementById('prog').style.width=(cur/12*100)+'%';
+  document.getElementById('score-label').textContent='正解 '+score;
+  document.getElementById('place-badge').textContent=s.place;
+  document.getElementById('scene-title').textContent=s.title;
+  document.getElementById('situation').textContent=s.situ;
+  document.getElementById('speech').textContent=s.speech;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('fb-moya').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+
+  var grid=document.getElementById('choices');
+  grid.innerHTML='';
+  shuffled=shuffle([0,1,2]);
+  shuffled.forEach(function(origIdx,pos){
+    var c=s.choices[origIdx];
+    var btn=document.createElement('button');
+    btn.className='ch-btn';
+    btn.innerHTML='<span class="ch-alph">'+['A','B','C'][pos]+'</span>'+c.x;
+    (function(oi){btn.onclick=function(){pick(oi);};})(origIdx);
+    grid.appendChild(btn);
+  });
+
+  var card=document.getElementById('scene-card');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function pick(origIdx){
+  if(answered)return;
+  answered=true;
+  var s=SCENES[cur];
+  var c=s.choices[origIdx];
+  if(c.t==='safe')score++;
+
+  document.querySelectorAll('.ch-btn').forEach(function(b,pos){
+    b.disabled=true;
+    if(shuffled[pos]===origIdx)b.classList.add('r-'+c.t);
+  });
+
+  var fb=document.getElementById('feedback');
+  fb.textContent=s.fb[c.t];
+  fb.className='feedback fb-'+c.t;
+  fb.style.display='block';
+
+  var moya=document.getElementById('fb-moya');
+  moya.innerHTML='<strong>このシーンのモヤり：</strong>'+s.moya;
+  moya.style.display='block';
+
+  if(c.t!=='safe'){
+    var card=document.getElementById('scene-card');
+    card.classList.add('bad-flash');
+    setTimeout(function(){card.classList.remove('bad-flash');},500);
+  }
+
+  document.getElementById('score-label').textContent='正解 '+score;
+  var nb=document.getElementById('next-btn');
+  nb.style.display='block';
+  nb.textContent=cur<11?'次へ →':'結果を見る';
+}
+
+function nextQ(){cur++;if(cur>=12){showResult();return;}renderQ();}
+
+function showResult(){
+  document.getElementById('prog').style.width='100%';
+  show('s-result');
+  var r=RESULTS[RESULTS.length-1];
+  for(var i=0;i<RESULTS.length;i++){if(score>=RESULTS[i].min){r=RESULTS[i];break;}}
+  document.getElementById('r-icon').textContent=r.icon;
+  document.getElementById('r-score').textContent=score+'問正解';
+  document.getElementById('r-title').textContent=r.title;
+  document.getElementById('r-comment').textContent=r.comment;
+  document.getElementById('r-twist').textContent='→ '+r.twist;
+}
+
+function retry(){cur=0;score=0;answered=false;show('s-game');renderQ();}
+
+function share(){
+  var r=RESULTS[RESULTS.length-1];
+  for(var i=0;i<RESULTS.length;i++){if(score>=RESULTS[i].min){r=RESULTS[i];break;}}
+  var txt='「褒めたらアウト。褒めなくてもアウト。」12問中'+score+'問正解。称号：'+r.title+'。\nあなたの善意は、誰かの地雷かもしれない。\nhttps://100makeniki.github.io/atsu-game-/ #圧ゲーjp #褒めたらアウト';
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt));
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(el){el.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
