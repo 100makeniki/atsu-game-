@@ -16,7 +16,6 @@
   }
   body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
 
-  /* HEADER */
   header { border-bottom: 1.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
   .logo { font-family: 'DotGothic16', monospace; font-size: 20px; letter-spacing: 0.05em; color: var(--text); text-decoration: none; }
   .logo span { color: var(--accent); }
@@ -24,7 +23,6 @@
   nav a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; }
   nav a:hover { color: var(--text); }
 
-  /* HERO */
   .hero { max-width: 860px; margin: 64px auto 56px; padding: 0 24px; }
   .hero-eyebrow { font-family: 'DotGothic16', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
   h1 { font-family: 'DotGothic16', monospace; font-size: clamp(36px, 6vw, 62px); line-height: 1.1; letter-spacing: 0.02em; }
@@ -35,11 +33,9 @@
   .hero-stat-num { font-family: 'DotGothic16', monospace; font-size: 28px; }
   .hero-stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
 
-  /* AD */
   .ad-wrap { max-width: 860px; margin: 0 auto 40px; padding: 0 24px; }
   .ad-slot { border: 1px dashed var(--border); border-radius: 2px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
 
-  /* SECTION */
   .section-wrap { max-width: 860px; margin: 0 auto 56px; padding: 0 24px; }
   .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
   .section-icon { font-size: 22px; }
@@ -47,10 +43,8 @@
   .section-count { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
   .section-line { flex: 1; height: 1px; background: var(--border); }
 
-  /* GRID */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 16px; }
 
-  /* CARD */
   .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; cursor: pointer; transition: transform 0.12s, border-color 0.12s; text-decoration: none; color: inherit; display: block; }
   .card:hover { transform: translateY(-2px); border-color: var(--text); }
   .card.featured { border-color: var(--accent); }
@@ -58,7 +52,6 @@
   .card.featured .card-thumb { height: 140px; font-size: 64px; }
   .badge { position: absolute; top: 10px; right: 10px; font-size: 10px; font-family: 'DotGothic16', monospace; padding: 3px 7px; letter-spacing: 0.08em; }
   .badge-pick { background: var(--accent); color: #fff; }
-  .badge-new { background: var(--danger); color: #fff; }
   .badge-coming { background: #1a1917; color: #fff; }
   .card-body { padding: 14px 16px 16px; }
   .card-title { font-family: 'DotGothic16', monospace; font-size: 14px; margin-bottom: 6px; letter-spacing: 0.03em; line-height: 1.4; }
@@ -71,7 +64,6 @@
   .card.coming { opacity: 0.6; pointer-events: none; }
   .card.coming .card-thumb { filter: grayscale(1); }
 
-  /* COLUMN */
   .column-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
   .col-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 4px; padding: 20px; }
   .col-eyebrow { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; font-family: 'DotGothic16', monospace; }
@@ -79,18 +71,12 @@
   .col-desc { font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 14px; }
   .col-date { font-size: 11px; color: var(--muted); }
 
-  /* FOOTER */
   footer { max-width: 860px; margin: 48px auto 0; padding: 24px 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--text); }
 
-  @media (max-width: 600px) {
-    .hero-stats { gap: 20px; }
-    .grid { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 400px) {
-    .grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 600px) { .hero-stats { gap: 20px; } .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -105,18 +91,17 @@
   </nav>
 </header>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">FREE MINI GAME PORTAL</div>
   <h1>この理不尽、<br><span class="hl">ゲームにした。</span></h1>
   <p class="hero-sub">職場の圧、モンスター客、謎のSDGs対応。<br>笑えるストレスを、全部ゲームにした。</p>
   <div class="hero-stats">
     <div class="hero-stat-item">
-      <span class="hero-stat-num">11</span>
+      <span class="hero-stat-num">15</span>
       <span class="hero-stat-label">GAMES AVAILABLE</span>
     </div>
     <div class="hero-stat-item">
-      <span class="hero-stat-num">7</span>
+      <span class="hero-stat-num">8</span>
       <span class="hero-stat-label">INDUSTRIES</span>
     </div>
     <div class="hero-stat-item">
@@ -126,17 +111,14 @@
   </div>
 </section>
 
-<!-- AD TOP -->
-<div class="ad-wrap">
-  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
-</div>
+<div class="ad-wrap"><div class="ad-slot">広告 / AdSense Banner (728×90)</div></div>
 
-<!-- ===================== 会社・オフィス ===================== -->
+<!-- 会社・オフィス -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">🏢</span>
     <span class="section-title">会社・オフィス</span>
-    <span class="section-count">3 PLAYABLE · 5 COMING</span>
+    <span class="section-count">4 PLAYABLE · 5 COMING</span>
     <span class="section-line"></span>
   </div>
   <div class="grid">
@@ -146,10 +128,37 @@
       <div class="card-body">
         <div class="card-title">圧強め上司から逃げろ</div>
         <div class="card-desc">「それアジャイルでいける？」「PMいらなくない？」——圧の言葉が降り注ぐ2分間、とにかく逃げ続けろ。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 12,483</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span><span class="card-plays">🕹 12,483</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/teiji-dash.html" class="card featured">
+      <div class="card-thumb">🏃</div>
+      <div class="card-body">
+        <div class="card-title">定時ダッシュ</div>
+        <div class="card-desc">18:00ちょうど、上司が声をかけてくる。エレベーターに飛び込め。右端で止まるな。</div>
+        <div class="card-meta"><span class="card-tag">タイミング系</span><span class="card-tag">2分</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/meeting-escape.html" class="card featured">
+      <div class="card-thumb">🚪</div>
+      <div class="card-body">
+        <div class="card-title">会議室からの脱出</div>
+        <div class="card-desc">終わりの見えない会議。正解してもペナルティが来る。「以上です」が言えるまで出られない。</div>
+        <div class="card-meta"><span class="card-tag">脱出系</span><span class="card-tag">全6問</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/gyaku-hara.html" class="card featured">
+      <div class="card-thumb">💣</div>
+      <div class="card-body">
+        <div class="card-title">部下が爆弾。</div>
+        <div class="card-desc">令和の部下は全員導火線付きだ。SNSテロ・退職代行・労基・写真流出——間違えるたびに時間が溶ける。</div>
+        <div class="card-meta"><span class="card-tag">タイムアタック</span><span class="card-tag">全12問</span><span class="card-tag">写真判定</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -190,32 +199,6 @@
       </div>
     </div>
 
-    <a href="game/teiji-dash.html" class="card featured">
-      <div class="card-thumb">🏃<span class="badge badge-new">NEW</span></div>
-      <div class="card-body">
-        <div class="card-title">定時ダッシュ</div>
-        <div class="card-desc">18:00ちょうど、上司が声をかけてくる。エレベーターに飛び込め。右端で止まるな。</div>
-        <div class="card-meta">
-          <span class="card-tag">タイミング系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
-        <span class="play-btn">▶ プレイする</span>
-      </div>
-    </a>
-
-    <a href="game/meeting-escape.html" class="card featured">
-      <div class="card-thumb">🚪<span class="badge badge-new">NEW</span></div>
-      <div class="card-body">
-        <div class="card-title">会議室からの脱出</div>
-        <div class="card-desc">終わりの見えない会議。正解してもペナルティが来る。「以上です」が言えるまで出られない。</div>
-        <div class="card-meta">
-          <span class="card-tag">脱出系</span><span class="card-tag">全6問</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
-        <span class="play-btn">▶ プレイする</span>
-      </div>
-    </a>
-
     <div class="card coming">
       <div class="card-thumb">💬<span class="badge badge-coming">COMING SOON</span></div>
       <div class="card-body">
@@ -228,7 +211,7 @@
   </div>
 </div>
 
-<!-- ===================== 医療・看護 ===================== -->
+<!-- 医療・看護 -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">🏥</span>
@@ -239,27 +222,21 @@
   <div class="grid">
 
     <a href="game/pressure-nurse.html" class="card featured">
-      <div class="card-thumb">😰<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">😰</div>
       <div class="card-body">
         <div class="card-title">圧強め先輩ナースから逃げろ</div>
         <div class="card-desc">「インシデント報告書いた？」「患者さんより先輩を見て」——病棟の圧が降り注ぐ2分間。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
 
     <a href="game/pressure-monster-patient.html" class="card featured">
-      <div class="card-thumb">🏥<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">🏥</div>
       <div class="card-body">
         <div class="card-title">モンスターペイシェントから逃げろ</div>
         <div class="card-desc">「俺を誰だと思ってる」「今すぐ院長を呼べ」——理不尽な要求をかわして今日も乗り切れ。</div>
-        <div class="card-meta">
-          <span class="card-tag">選択系</span><span class="card-tag">全10問</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">選択系</span><span class="card-tag">全10問</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -276,12 +253,9 @@
   </div>
 </div>
 
-<!-- AD MID -->
-<div class="ad-wrap">
-  <div class="ad-slot">広告 / AdSense Banner (728×90)</div>
-</div>
+<div class="ad-wrap"><div class="ad-slot">広告 / AdSense Banner (728×90)</div></div>
 
-<!-- ===================== 保育・教育 ===================== -->
+<!-- 保育・教育 -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">🏫</span>
@@ -292,40 +266,31 @@
   <div class="grid">
 
     <a href="game/pressure-hoiku.html" class="card featured">
-      <div class="card-thumb">🧸<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">🧸</div>
       <div class="card-body">
         <div class="card-title">圧強め主任保育士から逃げろ</div>
         <div class="card-desc">「連絡帳ちゃんと書いた？」「子どもの気持ちわかってる？」——保育室の圧が降り注ぐ。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
 
     <a href="game/pressure-shougakkou.html" class="card featured">
-      <div class="card-thumb">📚<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">📚</div>
       <div class="card-body">
         <div class="card-title">圧強め教務主任から逃げろ</div>
         <div class="card-desc">「学習指導要領読んだ？」「保護者からクレームきたよ」——職員室の圧が降り注ぐ。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
 
     <a href="game/pressure-monster-parent.html" class="card featured">
-      <div class="card-thumb">😤<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">😤</div>
       <div class="card-body">
         <div class="card-title">モンスターペアレントから逃げろ</div>
         <div class="card-desc">「うちの子だけ特別扱いして」「先生の言い方が気に食わない」——保護者の圧をかわせ。</div>
-        <div class="card-meta">
-          <span class="card-tag">選択系</span><span class="card-tag">全10問</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">選択系</span><span class="card-tag">全10問</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -342,7 +307,7 @@
   </div>
 </div>
 
-<!-- ===================== ギグワーカー ===================== -->
+<!-- ギグワーカー -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">📦</span>
@@ -353,14 +318,11 @@
   <div class="grid">
 
     <a href="game/pressure-gig.html" class="card featured">
-      <div class="card-thumb">🛵<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">🛵</div>
       <div class="card-body">
         <div class="card-title">ギグワーカーハラスメントから逃げろ</div>
         <div class="card-desc">「置き配したのに届いてない」「評価1にするから」——理不尽なクレームが降り注ぐ2分間、とにかく逃げ続けろ。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -378,7 +340,7 @@
       <div class="card-thumb">⭐<span class="badge badge-coming">COMING SOON</span></div>
       <div class="card-body">
         <div class="card-title">評価5.0維持サバイバー</div>
-        <div class="card-desc">理不尽な1つ星レビューが飛んでくる。かわし続けて星5を守れ。1件でも当たったらアウト。</div>
+        <div class="card-desc">理不尽な1つ星レビューが飛んでくる。かわし続けて星5を守れ。</div>
         <div class="card-meta"><span class="card-tag">回避系</span></div>
       </div>
     </div>
@@ -395,7 +357,7 @@
   </div>
 </div>
 
-<!-- ===================== モンスター系 ===================== -->
+<!-- モンスター客 -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">😡</span>
@@ -435,37 +397,64 @@
   </div>
 </div>
 
-<!-- ===================== LGBTQ ===================== -->
+<!-- LGBTQ -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">🏳️‍🌈</span>
     <span class="section-title">LGBTQ あるある</span>
-    <span class="section-count">1 PLAYABLE · 2 COMING</span>
+    <span class="section-count">4 PLAYABLE · 2 COMING</span>
     <span class="section-line"></span>
   </div>
   <div class="grid">
+
+    <a href="game/unconscious-bias.html" class="card featured">
+      <div class="card-thumb">💬<span class="badge badge-pick">PICK UP</span></div>
+      <div class="card-body">
+        <div class="card-title">アンコンシャスバイアス弾幕</div>
+        <div class="card-desc">「女の子っぽくないね」「日本語うまいね」——悪意のない一言が降り注ぐ。止まると狙われる。</div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/warui-wa-nakatta.html" class="card featured">
+      <div class="card-thumb">🌍</div>
+      <div class="card-body">
+        <div class="card-title">悪意はなかった。</div>
+        <div class="card-desc">「差別してない」は免罪符ではない。全10問。正解してもモヤる。それがこのゲームの正体だ。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">全10問</span><span class="card-tag">人種差別回避</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/feminism-jirai.html" class="card featured">
+      <div class="card-thumb">♀️</div>
+      <div class="card-body">
+        <div class="card-title">褒めたらアウト。褒めなくてもアウト。</div>
+        <div class="card-desc">「わかってるつもり」が一番危ない。全12問。あなたの善意は、誰かの地雷かもしれない。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">全12問</span><span class="card-tag">フェミニズム地雷</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
+
+    <a href="game/vegan-doseki.html" class="card featured">
+      <div class="card-thumb">🍖</div>
+      <div class="card-body">
+        <div class="card-title">気を遣っても怒られる。遣わなくても怒られる。</div>
+        <div class="card-desc">食事会にヴィーガンがいる。どちら側でも詰む。全8問、視点チェンジあり。</div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">全8問</span><span class="card-tag">視点チェンジ</span></div>
+        <span class="play-btn">▶ プレイする</span>
+      </div>
+    </a>
 
     <div class="card coming">
       <div class="card-thumb">💼<span class="badge badge-coming">COMING SOON</span></div>
       <div class="card-body">
         <div class="card-title">カミングアウトタイミング選択ゲーム</div>
-        <div class="card-desc">「それで言うなら俺も言っとこうかな」——無自覚な発言が飛び交う職場で、言う？言わない？</div>
+        <div class="card-desc">無自覚な発言が飛び交う職場で、言う？言わない？</div>
         <div class="card-meta"><span class="card-tag">シミュレーション</span></div>
       </div>
     </div>
-
-    <a href="game/unconscious-bias.html" class="card featured">
-      <div class="card-thumb">💬<span class="badge badge-new">NEW</span></div>
-      <div class="card-body">
-        <div class="card-title">アンコンシャスバイアス弾幕</div>
-        <div class="card-desc">「女の子っぽくないね」「日本語うまいね」——悪意のない一言が降り注ぐ。止まると狙われる。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
-        <span class="play-btn">▶ プレイする</span>
-      </div>
-    </a>
 
     <div class="card coming">
       <div class="card-thumb">📝<span class="badge badge-coming">COMING SOON</span></div>
@@ -479,7 +468,7 @@
   </div>
 </div>
 
-<!-- ===================== サステナ・SDGs ===================== -->
+<!-- サステナ・SDGs -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">🌱</span>
@@ -490,14 +479,11 @@
   <div class="grid">
 
     <a href="game/pressure-sdgs.html" class="card featured">
-      <div class="card-thumb">♻️<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">♻️</div>
       <div class="card-body">
         <div class="card-title">SDGsハラスメントから逃げろ</div>
         <div class="card-desc">「SDGsバッジつければいいでしょ」「エコバッグ配ろう」——中身のない施策が降り注ぐ2分間、とにかく逃げ続けろ。</div>
-        <div class="card-meta">
-          <span class="card-tag">回避系</span><span class="card-tag">2分</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">回避系</span><span class="card-tag">2分</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -532,8 +518,7 @@
   </div>
 </div>
 
-
-<!-- ===================== ハラスメント判定 ===================== -->
+<!-- ハラスメント判定 -->
 <div class="section-wrap">
   <div class="section-header">
     <span class="section-icon">⚖️</span>
@@ -544,14 +529,11 @@
   <div class="grid">
 
     <a href="game/pressure-quiz.html" class="card featured">
-      <div class="card-thumb">⚖️<span class="badge badge-new">NEW</span></div>
+      <div class="card-thumb">⚖️</div>
       <div class="card-body">
         <div class="card-title">それ、アウトです。ハラスメント判定クイズ</div>
         <div class="card-desc">「これってアウト？セーフ？」——2連続アウトでゲームオーバー。全15問、笑えるうちはまだ序盤。</div>
-        <div class="card-meta">
-          <span class="card-tag">クイズ</span><span class="card-tag">全15問</span>
-          <span class="card-plays">🕹 NEW</span>
-        </div>
+        <div class="card-meta"><span class="card-tag">クイズ</span><span class="card-tag">全15問</span></div>
         <span class="play-btn">▶ プレイする</span>
       </div>
     </a>
@@ -577,10 +559,7 @@
   </div>
 </div>
 
-<!-- AD BOTTOM -->
-<div class="ad-wrap">
-  <div class="ad-slot">広告 / AdSense Rectangle (336×280)</div>
-</div>
+<div class="ad-wrap"><div class="ad-slot">広告 / AdSense Rectangle (336×280)</div></div>
 
 <!-- COLUMN -->
 <div class="section-wrap" style="margin-bottom:0">
